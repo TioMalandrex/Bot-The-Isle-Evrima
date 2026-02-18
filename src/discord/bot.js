@@ -118,12 +118,12 @@ class DiscordBot {
   async handleGarageCommand(interaction) {
     await interaction.deferReply();
     
-    const player = this.database.getOrCreatePlayer(
+    const player = await this.database.getOrCreatePlayer(
       interaction.user.id,
       interaction.user.username
     );
     
-    const garage = this.database.getGarage(player.id);
+    const garage = await this.database.getGarage(player.id);
     
     const embed = new EmbedBuilder()
       .setTitle('🦖 Sua Garagem')
@@ -153,12 +153,12 @@ class DiscordBot {
     const nome = interaction.options.getString('nome') || 'Sem nome';
     const crescimento = interaction.options.getNumber('crescimento') || 1.0;
     
-    const player = this.database.getOrCreatePlayer(
+    const player = await this.database.getOrCreatePlayer(
       interaction.user.id,
       interaction.user.username
     );
     
-    this.database.storeInGarage(player.id, tipo, nome, crescimento, {});
+    await this.database.storeInGarage(player.id, tipo, nome, crescimento, {});
     
     const embed = new EmbedBuilder()
       .setTitle('✅ Dinossauro Armazenado')
@@ -172,7 +172,7 @@ class DiscordBot {
     await interaction.deferReply();
     
     const id = interaction.options.getInteger('id');
-    const item = this.database.retrieveFromGarage(id);
+    const item = await this.database.retrieveFromGarage(id);
     
     if (!item) {
       await interaction.editReply('❌ Dinossauro não encontrado na garagem.');
@@ -191,12 +191,12 @@ class DiscordBot {
     await interaction.deferReply();
     
     const tipo = interaction.options.getString('tipo');
-    const player = this.database.getOrCreatePlayer(
+    const player = await this.database.getOrCreatePlayer(
       interaction.user.id,
       interaction.user.username
     );
     
-    const skins = this.database.getPlayerSkins(player.id, tipo);
+    const skins = await this.database.getPlayerSkins(player.id, tipo);
     
     const embed = new EmbedBuilder()
       .setTitle('🎨 Suas Skins')
@@ -224,13 +224,13 @@ class DiscordBot {
     const tipo = interaction.options.getString('tipo');
     const skinId = interaction.options.getString('skin');
     
-    const player = this.database.getOrCreatePlayer(
+    const player = await this.database.getOrCreatePlayer(
       interaction.user.id,
       interaction.user.username
     );
     
     // Verificar se o jogador possui a skin
-    const skins = this.database.getPlayerSkins(player.id, tipo);
+    const skins = await this.database.getPlayerSkins(player.id, tipo);
     const hasSkin = skins.some(s => s.skin_id === skinId);
     
     if (!hasSkin) {
@@ -239,7 +239,7 @@ class DiscordBot {
     }
     
     // Aplicar a skin
-    this.database.setActiveSkin(player.id, tipo, skinId);
+    await this.database.setActiveSkin(player.id, tipo, skinId);
     
     // Tentar aplicar no servidor (se conectado)
     if (this.gameServer.isConnected()) {
@@ -261,13 +261,13 @@ class DiscordBot {
   async handleProfileCommand(interaction) {
     await interaction.deferReply();
     
-    const player = this.database.getOrCreatePlayer(
+    const player = await this.database.getOrCreatePlayer(
       interaction.user.id,
       interaction.user.username
     );
     
-    const garage = this.database.getGarage(player.id);
-    const skins = this.database.getPlayerSkins(player.id);
+    const garage = await this.database.getGarage(player.id);
+    const skins = await this.database.getPlayerSkins(player.id);
     
     const embed = new EmbedBuilder()
       .setTitle(`👤 Perfil de ${player.username}`)
