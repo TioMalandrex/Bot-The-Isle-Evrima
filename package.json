@@ -1,7 +1,7 @@
 {
   "name": "bot-the-isle-evrima",
-  "version": "1.0.0",
-  "description": "Bot para The Isle Evrima com comunicação entre Servidor, Discord e Site",
+  "version": "1.1.0",
+  "description": "Bot para The Isle Evrima com comunicação entre Servidor, Discord e Site - Build 21811079 compatível",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",

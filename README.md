@@ -158,15 +158,35 @@ Bot-The-Isle-Evrima/
    - Selecione permissões: "Send Messages", "Use Slash Commands"
    - Use a URL gerada para adicionar o bot ao seu servidor
 
-## 🎨 Tipos de Dinossauros Suportados
+## 🎨 Tipos de Dinossauros Suportados (Build 21811079 - Fev 2026)
 
+### Carnívoros (10)
 - Carnotaurus
+- Omniraptor
 - Ceratosaurus
-- Pachycephalosaurus
+- Troodon
+- Dilophosaurus
+- Pteranodon
+- Herrerasaurus
+- Deinosuchus
+- Allosaurus ⭐ (Recém adicionado)
+- Tyrannosaurus rex ⭐ (Recém adicionado)
+
+### Herbívoros (8)
 - Stegosaurus
 - Tenontosaurus
+- Hypsilophodon
+- Pachycephalosaurus
+- Diabloceratops
+- Dryosaurus
+- Maiasaura
 - Triceratops
-- Utahraptor
+
+### Onívoros (2)
+- Gallimimus
+- Beipiaosaurus
+
+**Total: 20 dinossauros jogáveis**
 
 ## 🗃️ Banco de Dados
 

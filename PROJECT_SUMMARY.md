@@ -161,15 +161,35 @@ fetch('http://localhost:3000/api/garage/SEU_DISCORD_ID')
   .then(data => console.log(data));
 ```
 
-## 🎮 Tipos de Dinossauros Suportados
+## 🎮 Tipos de Dinossauros Suportados (Build 21811079)
 
+### Carnívoros (10)
 - Carnotaurus
+- Omniraptor
 - Ceratosaurus
-- Pachycephalosaurus
+- Troodon
+- Dilophosaurus
+- Pteranodon
+- Herrerasaurus
+- Deinosuchus
+- Allosaurus ⭐
+- Tyrannosaurus rex ⭐
+
+### Herbívoros (8)
 - Stegosaurus
 - Tenontosaurus
+- Hypsilophodon
+- Pachycephalosaurus
+- Diabloceratops
+- Dryosaurus
+- Maiasaura
 - Triceratops
-- Utahraptor
+
+### Onívoros (2)
+- Gallimimus
+- Beipiaosaurus
+
+**Total: 20 dinossauros jogáveis** compatíveis com a versão atual do jogo (Fevereiro 2026).
 
 ## 🔧 Requisitos do Sistema
 

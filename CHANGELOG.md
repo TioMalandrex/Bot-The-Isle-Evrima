@@ -5,6 +5,28 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [1.1.0] - 2026-02-18
+
+### Adicionado
+- Suporte completo para Build 21811079 (Fevereiro 2026)
+- 13 novos dinossauros adicionados:
+  - **Carnívoros**: Omniraptor, Troodon, Dilophosaurus, Pteranodon, Herrerasaurus, Deinosuchus, Allosaurus, Tyrannosaurus rex
+  - **Herbívoros**: Hypsilophodon, Diabloceratops, Dryosaurus, Maiasaura
+  - **Onívoros**: Gallimimus, Beipiaosaurus
+- Arquivo de referência completo de dinossauros (DINOSAURS_REFERENCE.md)
+- Categorização por tipo (Carnívoros, Herbívoros, Onívoros)
+- Exemplos de skins para todos os novos dinossauros
+
+### Modificado
+- Interface web atualizada com 20 dinossauros
+- Seleção de dinossauros organizada por categoria
+- SKINS_EXAMPLES.md expandido com todas as espécies
+- README atualizado com lista completa
+- PROJECT_SUMMARY.md atualizado
+
+### Removido
+- Utahraptor (não disponível na Build 21811079)
+
 ## [1.0.0] - 2024-01-01
 
 ### Adicionado
@@ -46,7 +68,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
   - Validação de funcionalidades
 
 ### Características
-- Suporte a 7 tipos de dinossauros
+- Suporte inicial a 7 tipos de dinossauros
   - Carnotaurus
   - Ceratosaurus
   - Pachycephalosaurus
