@@ -161,7 +161,9 @@ class WebServer {
         // Tentar aplicar no servidor
         if (this.gameServer.isConnected()) {
           try {
-            await this.gameServer.changeSkin(player.username, dinosaurType, skinId);
+            // Use Steam ID if available, otherwise fall back to username
+            const playerIdentifier = player.steam_id || player.username;
+            await this.gameServer.changeSkin(playerIdentifier, dinosaurType, skinId);
           } catch (error) {
             console.error('Erro ao aplicar skin no servidor:', error);
           }

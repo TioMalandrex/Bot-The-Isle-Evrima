@@ -255,7 +255,9 @@ class DiscordBot {
     // Tentar aplicar no servidor (se conectado)
     if (this.gameServer.isConnected()) {
       try {
-        await this.gameServer.changeSkin(interaction.user.username, tipo, skinId);
+        // Use Steam ID if available, otherwise fall back to username
+        const playerIdentifier = player.steam_id || interaction.user.username;
+        await this.gameServer.changeSkin(playerIdentifier, tipo, skinId);
       } catch (error) {
         console.error('Erro ao aplicar skin no servidor:', error);
       }
