@@ -112,6 +112,7 @@ http://localhost:3000
 
 Comandos disponíveis:
 
+- `/link <steamid>` - Vincular seu Discord ao seu Steam ID
 - `/garage` - Ver seus dinossauros armazenados na garagem
 - `/store <tipo> [nome] [crescimento]` - Armazenar um dinossauro na garagem
 - `/retrieve <id>` - Recuperar um dinossauro da garagem
@@ -121,6 +122,7 @@ Comandos disponíveis:
 
 **Exemplos de uso:**
 ```
+/link steamid:76561198012345678
 /store tipo:Tyrannosaurus nome:Rexy crescimento:1.0
 /changeskin tipo:Tyrannosaurus skin:rex_apex
 /garage
@@ -202,10 +204,20 @@ O bot pode se conectar ao servidor The Isle Evrima via RCON para aplicar mudanç
 
 ### Identificação de Jogadores
 
-⚠️ **Importante:** O bot identifica jogadores no servidor usando o **username do Discord**.
+O bot identifica jogadores no servidor usando o **Steam ID** vinculado ao Discord.
+
+**Como vincular:**
+1. Use o comando `/link` no Discord com seu Steam ID
+2. O bot armazena a associação entre seu Discord e Steam ID
+3. Agora você pode ser identificado corretamente no servidor
+
+**Para encontrar seu Steam ID:**
+- Acesse https://steamid.io/
+- Insira sua URL do perfil Steam
+- Use o Steam ID 64 (17 dígitos)
 
 Para que a skin seja aplicada corretamente:
-- O nome no Discord deve ser igual ao nome no jogo
+- Você deve ter vinculado seu Steam ID usando `/link`
 - O jogador deve estar online no servidor
 - RCON deve estar configurado e conectado
 

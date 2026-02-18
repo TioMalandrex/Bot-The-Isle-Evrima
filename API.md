@@ -22,11 +22,43 @@ GET /api/player/:discordId
 {
   "id": 1,
   "discord_id": "123456789",
-  "steam_id": null,
+  "steam_id": "76561198012345678",
   "username": "PlayerName",
   "created_at": "2024-01-01T00:00:00.000Z"
 }
 ```
+
+#### Link Steam ID
+```http
+POST /api/player/link
+```
+
+**Body:**
+```json
+{
+  "discordId": "123456789",
+  "steamId": "76561198012345678"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Steam ID vinculado com sucesso",
+  "player": {
+    "id": 1,
+    "discord_id": "123456789",
+    "steam_id": "76561198012345678",
+    "username": "PlayerName",
+    "created_at": "2024-01-01T00:00:00.000Z"
+  }
+}
+```
+
+**Error Responses:**
+- `400` - Steam ID inválido ou já vinculado a outra conta
+- `500` - Erro interno do servidor
 
 ---
 

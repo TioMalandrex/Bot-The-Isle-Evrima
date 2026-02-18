@@ -202,6 +202,29 @@ class DatabaseManager {
     });
   }
 
+  updatePlayerSteamId(discordId, steamId) {
+    return new Promise((resolve, reject) => {
+      this.db.run('UPDATE players SET steam_id = ? WHERE discord_id = ?', 
+        [steamId, discordId], function(err) {
+        if (err) reject(err);
+        else if (this.changes === 0) {
+          reject(new Error('Player not found'));
+        } else {
+          resolve(this.changes);
+        }
+      });
+    });
+  }
+
+  getPlayerBySteamId(steamId) {
+    return new Promise((resolve, reject) => {
+      this.db.get('SELECT * FROM players WHERE steam_id = ?', [steamId], (err, row) => {
+        if (err) reject(err);
+        else resolve(row);
+      });
+    });
+  }
+
   close() {
     this.db.close();
   }

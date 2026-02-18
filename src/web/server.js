@@ -36,6 +36,44 @@ class WebServer {
       }
     });
 
+    this.app.post('/api/player/link', async (req, res) => {
+      try {
+        const { discordId, steamId } = req.body;
+        
+        if (!discordId || !steamId) {
+          return res.status(400).json({ error: 'Discord ID e Steam ID são obrigatórios' });
+        }
+        
+        // Validate Steam ID format
+        if (!/^\d{17}$/.test(steamId)) {
+          return res.status(400).json({ error: 'Steam ID inválido. Deve conter 17 dígitos numéricos.' });
+        }
+        
+        // Check if Steam ID is already linked to another account
+        const existingPlayer = await this.database.getPlayerBySteamId(steamId);
+        if (existingPlayer && existingPlayer.discord_id !== discordId) {
+          return res.status(400).json({ error: 'Este Steam ID já está vinculado a outra conta Discord.' });
+        }
+        
+        // Create or get player
+        const player = await this.database.getOrCreatePlayer(discordId, 'WebUser');
+        
+        // Update Steam ID
+        await this.database.updatePlayerSteamId(discordId, steamId);
+        
+        // Get updated player data
+        const updatedPlayer = await this.database.getPlayer(discordId);
+        
+        res.json({ 
+          success: true, 
+          message: 'Steam ID vinculado com sucesso',
+          player: updatedPlayer
+        });
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+
     // Garage
     this.app.get('/api/garage/:discordId', async (req, res) => {
       try {

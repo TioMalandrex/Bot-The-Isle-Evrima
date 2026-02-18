@@ -47,6 +47,9 @@ class DiscordBot {
           case 'profile':
             await this.handleProfileCommand(interaction);
             break;
+          case 'link':
+            await this.handleLinkCommand(interaction);
+            break;
         }
       } catch (error) {
         console.error('Erro ao processar comando:', error);
@@ -111,7 +114,15 @@ class DiscordBot {
       
       new SlashCommandBuilder()
         .setName('profile')
-        .setDescription('Ver seu perfil de jogador')
+        .setDescription('Ver seu perfil de jogador'),
+      
+      new SlashCommandBuilder()
+        .setName('link')
+        .setDescription('Vincular seu Discord ao seu Steam ID')
+        .addStringOption(option =>
+          option.setName('steamid')
+            .setDescription('Seu Steam ID (ex: 76561198012345678)')
+            .setRequired(true))
     ];
   }
 
@@ -274,12 +285,64 @@ class DiscordBot {
       .setColor('#0099ff')
       .addFields(
         { name: 'Discord ID', value: player.discord_id, inline: true },
+        { name: 'Steam ID', value: player.steam_id || 'Não vinculado', inline: true },
         { name: 'Dinossauros na Garagem', value: garage.length.toString(), inline: true },
         { name: 'Skins Desbloqueadas', value: skins.length.toString(), inline: true },
         { name: 'Membro desde', value: new Date(player.created_at).toLocaleDateString('pt-BR'), inline: true }
       );
     
     await interaction.editReply({ embeds: [embed] });
+  }
+
+  async handleLinkCommand(interaction) {
+    await interaction.deferReply({ ephemeral: true });
+    
+    const steamId = interaction.options.getString('steamid');
+    
+    // Validate Steam ID format (basic validation)
+    if (!/^\d{17}$/.test(steamId)) {
+      await interaction.editReply({
+        content: '❌ Steam ID inválido. Deve conter 17 dígitos numéricos (ex: 76561198012345678).'
+      });
+      return;
+    }
+    
+    try {
+      // Check if Steam ID is already linked to another account
+      const existingPlayer = await this.database.getPlayerBySteamId(steamId);
+      if (existingPlayer && existingPlayer.discord_id !== interaction.user.id) {
+        await interaction.editReply({
+          content: '❌ Este Steam ID já está vinculado a outra conta Discord.'
+        });
+        return;
+      }
+      
+      // Create or get player
+      const player = await this.database.getOrCreatePlayer(
+        interaction.user.id,
+        interaction.user.username
+      );
+      
+      // Update Steam ID
+      await this.database.updatePlayerSteamId(interaction.user.id, steamId);
+      
+      const embed = new EmbedBuilder()
+        .setTitle('✅ Steam ID Vinculado')
+        .setColor('#00ff00')
+        .setDescription(`Seu Discord foi vinculado ao Steam ID: **${steamId}**`)
+        .addFields(
+          { name: 'Discord', value: interaction.user.username, inline: true },
+          { name: 'Steam ID', value: steamId, inline: true }
+        )
+        .setFooter({ text: 'Agora você pode ser identificado no servidor do jogo!' });
+      
+      await interaction.editReply({ embeds: [embed] });
+    } catch (error) {
+      console.error('Erro ao vincular Steam ID:', error);
+      await interaction.editReply({
+        content: '❌ Erro ao vincular Steam ID. Tente novamente.'
+      });
+    }
   }
 
   async start() {
