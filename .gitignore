@@ -3,3 +3,16 @@ node_modules/
 data/
 *.log
 .DS_Store
+*.db
+*.db-journal
+tests/*.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.npm
+.eslintcache
+coverage/
+dist/
+build/
