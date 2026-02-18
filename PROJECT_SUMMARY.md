@@ -224,9 +224,11 @@ Este projeto está sob a licença MIT. Veja [LICENSE](LICENSE) para mais detalhe
 
 **Status**: ✅ Funcional e pronto para uso
 
-**Última Atualização**: Janeiro 2024
+**Última Atualização**: Fevereiro 2026
 
-**Versão**: 1.0.0
+**Versão**: 1.1.0
+
+**Build Compatível**: 21811079
 
 ---
 

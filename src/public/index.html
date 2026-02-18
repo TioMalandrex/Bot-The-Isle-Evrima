@@ -344,10 +344,12 @@
         let currentDiscordId = '';
 
         function showTab(tabName) {
+            const clickedTab = event ? event.target : document.querySelector('.tab.active');
+            
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             
-            event.target.classList.add('active');
+            if (clickedTab) clickedTab.classList.add('active');
             document.getElementById(tabName + 'Tab').classList.add('active');
             
             if (currentDiscordId) {
