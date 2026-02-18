@@ -27,9 +27,9 @@ Um bot completo para o jogo **The Isle Evrima** com comunicação entre Servidor
 - Node.js 16.x ou superior
 - npm ou yarn
 - Conta Discord para criar um bot
-- Servidor The Isle Evrima com RCON habilitado
+- (Opcional) Servidor The Isle Evrima com RCON habilitado
 
-### Passos de Instalação
+### 🚀 Guia Rápido de Instalação
 
 1. **Clone o repositório**
 ```bash
@@ -42,7 +42,24 @@ cd Bot-The-Isle-Evrima
 npm install
 ```
 
-3. **Configure as variáveis de ambiente**
+3. **Configure o Bot Discord**
+
+Crie seu bot no Discord:
+- Acesse https://discord.com/developers/applications
+- Clique em "New Application" e dê um nome (ex: "The Isle Bot")
+- Vá para "Bot" → "Add Bot"
+- Em "Privileged Gateway Intents", habilite **MESSAGE CONTENT INTENT**
+- Copie o **Token** do bot
+- Em "OAuth2" → "General", copie o **Client ID**
+
+Adicione o bot ao seu servidor:
+- Vá para "OAuth2" → "URL Generator"
+- Selecione scopes: `bot` e `applications.commands`
+- Selecione permissões: "Send Messages", "Use Slash Commands", "Read Message History"
+- Copie e abra a URL gerada no navegador
+- Selecione seu servidor e autorize
+
+4. **Configure as variáveis de ambiente**
 ```bash
 cp .env.example .env
 ```
@@ -50,14 +67,14 @@ cp .env.example .env
 Edite o arquivo `.env` com suas configurações:
 ```env
 # Discord Bot Configuration
-DISCORD_TOKEN=seu_token_do_discord_aqui
+DISCORD_TOKEN=seu_token_aqui
 DISCORD_CLIENT_ID=seu_client_id_aqui
 
 # Web Server Configuration
 WEB_PORT=3000
 WEB_HOST=0.0.0.0
 
-# Game Server Configuration (RCON)
+# Game Server Configuration (RCON) - OPCIONAL
 GAME_SERVER_HOST=localhost
 GAME_SERVER_PORT=8888
 GAME_SERVER_PASSWORD=sua_senha_rcon_aqui
@@ -66,7 +83,9 @@ GAME_SERVER_PASSWORD=sua_senha_rcon_aqui
 DATABASE_PATH=./data/bot.db
 ```
 
-4. **Inicie o bot**
+**Nota:** O servidor do jogo (RCON) é opcional. O bot funciona perfeitamente sem ele!
+
+5. **Inicie o bot**
 ```bash
 npm start
 ```
@@ -75,6 +94,17 @@ Para desenvolvimento com auto-reload:
 ```bash
 npm run dev
 ```
+
+6. **Acesse a Interface Web**
+```
+http://localhost:3000
+```
+
+### ⚠️ Problemas Comuns
+
+- **"Cannot find module"**: Execute `npm install` novamente
+- **"Invalid token"**: Verifique se o token do Discord no `.env` está correto
+- **"Connection refused" (servidor)**: Normal se não tiver servidor The Isle configurado. O bot funciona mesmo assim!
 
 ## 🎮 Uso
 
@@ -89,10 +119,11 @@ Comandos disponíveis:
 - `/changeskin <tipo> <skin>` - Mudar a skin de um dinossauro
 - `/profile` - Ver seu perfil de jogador
 
-**Exemplo de uso:**
+**Exemplos de uso:**
 ```
-/store tipo:Carnotaurus nome:Rex crescimento:1.0
-/changeskin tipo:Carnotaurus skin:skin_001
+/store tipo:Tyrannosaurus nome:Rexy crescimento:1.0
+/changeskin tipo:Tyrannosaurus skin:rex_apex
+/garage
 ```
 
 ### Interface Web
@@ -107,22 +138,33 @@ Acesse `http://localhost:3000` no seu navegador.
 
 ### API REST
 
-O bot expõe uma API REST completa:
+O bot expõe uma API REST completa. [Veja documentação completa da API](API.md)
 
-#### Endpoints de Garagem
+#### Endpoints Principais
 - `GET /api/garage/:discordId` - Listar dinossauros na garagem
 - `POST /api/garage` - Armazenar dinossauro
 - `DELETE /api/garage/:id` - Remover dinossauro
-
-#### Endpoints de Skins
 - `GET /api/skins/:discordId` - Listar skins do jogador
 - `POST /api/skins/unlock` - Desbloquear nova skin
 - `POST /api/skins/apply` - Aplicar skin
 - `GET /api/skins/active/:discordId/:dinosaurType` - Ver skin ativa
-
-#### Outros
 - `GET /api/player/:discordId` - Informações do jogador
 - `GET /api/status` - Status da conexão com o servidor
+
+**Exemplo JavaScript:**
+```javascript
+// Armazenar um T-Rex na garagem
+const response = await fetch('http://localhost:3000/api/garage', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    discordId: 'SEU_DISCORD_ID',
+    dinosaurType: 'Tyrannosaurus',
+    dinosaurName: 'Rexy',
+    growthStage: 1.0
+  })
+});
+```
 
 ## 🏗️ Estrutura do Projeto
 
@@ -147,6 +189,39 @@ Bot-The-Isle-Evrima/
 └── README.md
 ```
 
+## 🎮 Integração com Servidor do Jogo (RCON)
+
+O bot pode se conectar ao servidor The Isle Evrima via RCON para aplicar mudanças em tempo real.
+
+### Como Funciona
+
+1. **Usuário solicita mudança** (Discord/Web) → `/changeskin tipo:Tyrannosaurus skin:rex_apex`
+2. **Bot valida permissões** → Verifica se o jogador possui a skin no banco de dados
+3. **Atualiza banco de dados** → Marca a skin como ativa
+4. **Envia comando RCON** → Se conectado, aplica no servidor: `changeskin username Tyrannosaurus rex_apex`
+
+### Identificação de Jogadores
+
+⚠️ **Importante:** O bot identifica jogadores no servidor usando o **username do Discord**.
+
+Para que a skin seja aplicada corretamente:
+- O nome no Discord deve ser igual ao nome no jogo
+- O jogador deve estar online no servidor
+- RCON deve estar configurado e conectado
+
+> 📖 **Para detalhes completos sobre comunicação bot-servidor, veja:** [SERVER_COMMUNICATION.md](SERVER_COMMUNICATION.md)
+
+### Configuração RCON (Opcional)
+
+No arquivo `.env`:
+```env
+GAME_SERVER_HOST=seu_servidor.com  # IP ou hostname do servidor
+GAME_SERVER_PORT=8888              # Porta RCON (padrão 8888)
+GAME_SERVER_PASSWORD=senha_secreta # Senha RCON do servidor
+```
+
+**Nota:** O bot funciona normalmente mesmo sem RCON configurado. As skins ficam salvas no banco de dados e podem ser aplicadas quando o servidor estiver disponível.
+
 ## 🔧 Configuração do Discord Bot
 
 1. Acesse o [Discord Developer Portal](https://discord.com/developers/applications)
@@ -169,8 +244,8 @@ Bot-The-Isle-Evrima/
 - Pteranodon
 - Herrerasaurus
 - Deinosuchus
-- Allosaurus ⭐ (Recém adicionado)
-- Tyrannosaurus rex ⭐ (Recém adicionado)
+- **Allosaurus** ⭐ (Recém adicionado)
+- **Tyrannosaurus rex** ⭐ (Recém adicionado)
 
 ### Herbívoros (8)
 - Stegosaurus
@@ -188,6 +263,47 @@ Bot-The-Isle-Evrima/
 
 **Total: 20 dinossauros jogáveis**
 
+> 📖 Para informações detalhadas sobre habilidades e estratégias de cada dinossauro, consulte [DINOSAURS_REFERENCE.md](DINOSAURS_REFERENCE.md)
+
+## 🎨 Exemplos de Skins
+
+O sistema suporta skins personalizadas para todos os dinossauros. Aqui estão alguns exemplos:
+
+### Tyrannosaurus rex
+- `rex_default` - Padrão
+- `rex_apex` - Apex (pele escura dominante)
+- `rex_king` - Rei (dourado majestoso)
+- `rex_alpha` - Alpha (listras vermelhas)
+- `rex_nightmare` - Pesadelo (preto com detalhes vermelhos)
+
+### Allosaurus
+- `allo_default` - Padrão
+- `allo_apex` - Apex
+- `allo_hunter` - Caçador
+- `allo_alpha` - Alpha
+
+### Carnotaurus
+- `carno_default` - Padrão
+- `carno_desert` - Deserto
+- `carno_jungle` - Selva
+- `carno_night` - Noturno
+
+**Como usar:**
+```
+# Via Discord
+/changeskin tipo:Tyrannosaurus skin:rex_apex
+
+# Via API
+POST /api/skins/apply
+{
+  "discordId": "SEU_ID",
+  "dinosaurType": "Tyrannosaurus",
+  "skinId": "rex_apex"
+}
+```
+
+> 💡 **Nota:** Os IDs de skin devem corresponder aos configurados no servidor The Isle Evrima.
+
 ## 🗃️ Banco de Dados
 
 O bot usa SQLite com as seguintes tabelas:
@@ -197,15 +313,39 @@ O bot usa SQLite com as seguintes tabelas:
 - **skins**: Skins desbloqueadas
 - **active_skins**: Skins atualmente aplicadas
 
+## 📚 Documentação Adicional
+
+- 📖 [DINOSAURS_REFERENCE.md](DINOSAURS_REFERENCE.md) - Guia completo de dinossauros com habilidades e estratégias
+- 🔌 [API.md](API.md) - Documentação completa da API REST
+- 🔗 [SERVER_COMMUNICATION.md](SERVER_COMMUNICATION.md) - Como o bot se comunica com o servidor do jogo
+- 🤝 [CONTRIBUTING.md](CONTRIBUTING.md) - Guia de contribuição para desenvolvedores
+- 🔒 [SECURITY.md](SECURITY.md) - Informações de segurança e melhores práticas
+- 📝 [CHANGELOG.md](CHANGELOG.md) - Histórico de versões e mudanças
+
 ## 🤝 Contribuindo
 
-Contribuições são bem-vindas! Sinta-se à vontade para:
+Contribuições são bem-vindas! Por favor:
 
-1. Fazer fork do projeto
-2. Criar uma branch para sua feature (`git checkout -b feature/NovaFuncionalidade`)
+1. Faça fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/NovaFuncionalidade`)
 3. Commit suas mudanças (`git commit -m 'Adiciona nova funcionalidade'`)
 4. Push para a branch (`git push origin feature/NovaFuncionalidade`)
-5. Abrir um Pull Request
+5. Abra um Pull Request
+
+Para mais detalhes, consulte [CONTRIBUTING.md](CONTRIBUTING.md)
+
+## 🧪 Testes
+
+Execute os testes do sistema:
+```bash
+npm test
+```
+
+Os testes validam:
+- ✅ Criação e manipulação do banco de dados
+- ✅ Sistema de garagem (armazenar/recuperar)
+- ✅ Sistema de skins (desbloquear/aplicar)
+- ✅ Gerenciamento de jogadores
 
 ## 📝 Licença
 

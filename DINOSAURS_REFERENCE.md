@@ -1,136 +1,181 @@
-# Referência de Dinossauros - The Isle Evrima Build 21811079
+# 🦖 Guia Completo: Dinossauros Jogáveis - The Isle Evrima Build 21811079
 
-Este arquivo contém informações sobre todos os dinossauros jogáveis na Build 21811079 (Fevereiro 2026).
+Este arquivo detalha as espécies disponíveis, focando em suas habilidades únicas e nichos de sobrevivência no mapa Gateway (Fevereiro 2026).
 
-## CARNÍVOROS (10 espécies)
+## 🥩 CARNÍVOROS (10 espécies)
+
+### 👑 Tyrannosaurus rex ⭐ Apex
+- **Nicho**: Predador Apex Solitário
+- **Dieta**: Carne, qualquer presa
+- **Habilidades**: 
+  - **Bone Break**: Mordida que quebra ossos
+  - **Deep Bleed**: Causa sangramento profundo
+  - Possui o rugido de ameaça mais intimidador do jogo
+- **Estilo de jogo**: Lento, mas letal. Domina por força bruta e rastreamento
+
+### ⚔️ Allosaurus ⭐ Novo
+- **Nicho**: Caçador de Grandes Herbívoros
+- **Dieta**: Carne, grandes presas
+- **Habilidades**: 
+  - **Grapple**: Agarra presas médias
+  - **Shred**: Causa sangramento massivo
+- **Estilo de jogo**: Equilíbrio entre velocidade e força. Extremamente perigoso em grupos (packs)
 
 ### 🦖 Carnotaurus
-- **Tipo**: Carnívoro médio-grande
+- **Nicho**: Perseguidor de Campo Aberto
 - **Dieta**: Carne
-- **Habilidades**: Corrida rápida, mordida poderosa
-- **Estilo de jogo**: Caçador solitário ou em pequenos grupos
-
-### 🦅 Omniraptor
-- **Tipo**: Carnívoro pequeno
-- **Dieta**: Carne, pequenas presas
-- **Habilidades**: Agilidade, visão noturna
-- **Estilo de jogo**: Caçador furtivo, emboscadas
+- **Habilidades**: 
+  - **Ram**: Investida com a cabeça que derruba oponentes
+- **Estilo de jogo**: O velocista dos grandes carnívoros. Depende de espaço para correr e dar o bote
 
 ### 🦎 Ceratosaurus
-- **Tipo**: Carnívoro médio
+- **Nicho**: Ladrão de Carcaças (Bully Scavenger)
 - **Dieta**: Carne
-- **Habilidades**: Natação, mordida forte
-- **Estilo de jogo**: Versátil, semi-aquático
-
-### 🌙 Troodon
-- **Tipo**: Carnívoro pequeno
-- **Dieta**: Carne, pequenos animais
-- **Habilidades**: Inteligência, visão noturna excepcional
-- **Estilo de jogo**: Caçador noturno em grupo
-
-### 💦 Dilophosaurus
-- **Tipo**: Carnívoro médio
-- **Dieta**: Carne
-- **Habilidades**: Veneno/cuspe, velocidade
-- **Estilo de jogo**: Caçador em grupo, controle de área
-
-### 🦇 Pteranodon
-- **Tipo**: Carnívoro voador
-- **Dieta**: Peixes, pequenos animais
-- **Habilidades**: Voo, pesca
-- **Estilo de jogo**: Aéreo, pescador
-
-### 🦴 Herrerasaurus
-- **Tipo**: Carnívoro médio
-- **Dieta**: Carne
-- **Habilidades**: Velocidade, resistência
-- **Estilo de jogo**: Caçador primitivo versátil
+- **Habilidades**: 
+  - **Chuffing**: Detecta carne à distância
+  - **Charged Bite**: Causa vômito e perda de estamina no alvo
+- **Estilo de jogo**: Resistente. Pode enfrentar predadores maiores para roubar comida
 
 ### 🐊 Deinosuchus
-- **Tipo**: Carnívoro aquático gigante
+- **Nicho**: Predador de Emboscada Aquático
 - **Dieta**: Carne, grandes presas
-- **Habilidades**: Emboscada aquática, mordida devastadora
-- **Estilo de jogo**: Predador de emboscada aquático
+- **Habilidades**: 
+  - **Lunging Grab**: Puxa presas da margem para a água
+  - **Death Roll**: Roda mortífera
+- **Estilo de jogo**: Vive em rios e lagos. É o terror de quem para para beber água
 
-### ⚔️ Allosaurus ⭐ NOVO
-- **Tipo**: Carnívoro grande
-- **Dieta**: Carne, grandes presas
-- **Habilidades**: Força, resistência, caça em grupo
-- **Estilo de jogo**: Apex predador em grupo
+### 💦 Dilophosaurus
+- **Nicho**: Caçador Noturno Psicológico
+- **Dieta**: Carne
+- **Habilidades**: 
+  - **Hallucination Venom**: Mordida que causa alucinações e clones visuais na vítima
+- **Estilo de jogo**: Ataca nas sombras, deixando a presa desorientada antes do abate final
 
-### 👑 Tyrannosaurus rex ⭐ NOVO
-- **Tipo**: Carnívoro apex gigante
-- **Dieta**: Carne, qualquer presa
-- **Habilidades**: Mordida mais poderosa, sentidos aguçados
-- **Estilo de jogo**: Apex predador solitário dominante
+### 🦅 Omniraptor
+- **Nicho**: Caçador de Matilha
+- **Dieta**: Carne, pequenas presas
+- **Habilidades**: 
+  - **Pounce**: Pula e se agarra à presa para rasgar e causar sangramento
+- **Estilo de jogo**: Ágil e tático. Depende de números para derrubar alvos grandes
+
+### 🦴 Herrerasaurus
+- **Nicho**: Predador Arbóreo
+- **Dieta**: Carne
+- **Habilidades**: 
+  - **Climbing**: Escala árvores
+  - **Leap Attack**: Pula de galhos altos causando dano por impacto
+- **Estilo de jogo**: Verticalidade total. Fica escondido nas copas das árvores esperando o momento certo
+
+### 🌙 Troodon
+- **Nicho**: Assediador de Grupo
+- **Dieta**: Carne, pequenos animais
+- **Habilidades**: 
+  - **Pounce Venenoso**: Mordidas repetidas aumentam o estágio do veneno até o colapso do alvo
+- **Estilo de jogo**: Requer coordenação perfeita entre jogadores para ser efetivo
+
+### 🦇 Pteranodon
+- **Nicho**: Pescador Aéreo
+- **Dieta**: Peixes, pequenos animais
+- **Habilidades**: 
+  - **Skimming**: Pesca peixes na superfície da água enquanto voa
+- **Estilo de jogo**: Frágil, mas com mobilidade suprema. Ótimo para exploração
 
 ---
 
-## HERBÍVOROS (8 espécies)
+## 🌿 HERBÍVOROS (8 espécies)
+
+### 🦏 Triceratops ⭐ Apex
+- **Nicho**: Tanque Defensivo
+- **Dieta**: Plantas
+- **Habilidades**: 
+  - **Stomp**: Pisoteio
+  - **Gore**: Chifrada que causa sangramento crítico
+- **Estilo de jogo**: Lento, mas quase impossível de ser abatido de frente
 
 ### 🦕 Stegosaurus
-- **Tipo**: Herbívoro grande
+- **Nicho**: Defensor de Retaguarda
 - **Dieta**: Plantas
-- **Habilidades**: Placas defensivas, cauda espinhosa
-- **Estilo de jogo**: Defensor de rebanho
-
-### 🦌 Tenontosaurus
-- **Tipo**: Herbívoro médio
-- **Dieta**: Plantas
-- **Habilidades**: Velocidade moderada, vida em rebanho
-- **Estilo de jogo**: Presa de rebanho
-
-### 🐰 Hypsilophodon
-- **Tipo**: Herbívoro pequeno
-- **Dieta**: Plantas baixas
-- **Habilidades**: Velocidade, agilidade
-- **Estilo de jogo**: Corredor rápido, fuga
-
-### 💥 Pachycephalosaurus
-- **Tipo**: Herbívoro médio
-- **Dieta**: Plantas
-- **Habilidades**: Cabeçada, crânio espesso
-- **Estilo de jogo**: Lutador territorial
+- **Habilidades**: 
+  - **Tail Lash**: Golpe de cauda que pode matar instantaneamente carnívoros médios
+- **Estilo de jogo**: Defensivo. Protege o bando mantendo a cauda voltada para o perigo
 
 ### 🛡️ Diabloceratops
-- **Tipo**: Herbívoro grande
+- **Nicho**: Combatente de Médio Porte
 - **Dieta**: Plantas
-- **Habilidades**: Chifres defensivos, carga
-- **Estilo de jogo**: Defensor territorial
+- **Habilidades**: 
+  - **Sparring**: Mecanismo de bloqueio e contra-ataque frontal
+- **Estilo de jogo**: Muito agressivo para um herbívoro. Excelente para punir raptores
 
-### 🏃 Dryosaurus
-- **Tipo**: Herbívoro pequeno-médio
+### 🦌 Tenontosaurus
+- **Nicho**: Lutador Versátil
 - **Dieta**: Plantas
-- **Habilidades**: Velocidade, resistência
-- **Estilo de jogo**: Corredor de resistência
+- **Habilidades**: 
+  - **Tail Slam**: Atordoa
+  - **Rear Kick**: Coice poderoso
+- **Estilo de jogo**: "Mestre das armas". Usa a cauda e as patas para manter os predadores à distância
+
+### 💥 Pachycephalosaurus
+- **Nicho**: Defensor Territorial
+- **Dieta**: Plantas
+- **Habilidades**: 
+  - **Headbutt**: Cabeçada que causa fraturas e atordoamento
+- **Estilo de jogo**: Focado em quebrar as pernas dos carnívoros para permitir a fuga ou o abate
 
 ### 👨‍👩‍👧‍👦 Maiasaura
-- **Tipo**: Herbívoro grande
+- **Nicho**: Protetora de Rebanho
 - **Dieta**: Plantas
-- **Habilidades**: Cuidado parental, vida em rebanho
-- **Estilo de jogo**: Rebanho social
+- **Habilidades**: 
+  - **Stomp**: Pisoteio
+  - Alta resistência para corridas longas
+- **Estilo de jogo**: O "carro de combate" dos herbívoros; usa o corpo para atropelar ameaças
 
-### 🦏 Triceratops
-- **Tipo**: Herbívoro gigante
+### 🏃 Dryosaurus
+- **Nicho**: Especialista em Fuga
 - **Dieta**: Plantas
-- **Habilidades**: Três chifres, escudo craniano, carga
-- **Estilo de jogo**: Tanque defensivo
+- **Habilidades**: 
+  - **Dodge**: Esquiva rápida lateral
+  - **Burrow**: Cria tocas para se esconder
+- **Estilo de jogo**: Sobrevivência pura através da agilidade e evasão
+
+### 🐰 Hypsilophodon
+- **Nicho**: Observador Pequeno
+- **Dieta**: Plantas baixas
+- **Habilidades**: 
+  - **Blinding Spit**: Cuspe que cega temporariamente o agressor
+- **Estilo de jogo**: Escala rochas e usa o cuspe para escapar de emboscadas
 
 ---
 
-## ONÍVOROS (2 espécies)
+## 🥗 ONÍVOROS (2 espécies)
 
 ### 🏃‍♂️ Gallimimus
-- **Tipo**: Onívoro médio
+- **Nicho**: Fugitivo de Alta Velocidade
 - **Dieta**: Plantas, insetos, pequenos animais
-- **Habilidades**: Velocidade extrema, resistência
-- **Estilo de jogo**: Corredor mais rápido do jogo
+- **Habilidades**: 
+  - **Group Buff**: Corre mais rápido em bando
+  - **Kick**: Chute frontal
+- **Estilo de jogo**: O animal mais rápido do jogo. Sobrevive evitando qualquer combate direto
 
 ### 🪶 Beipiaosaurus
-- **Tipo**: Onívoro médio
+- **Nicho**: Mergulhador Semi-aquático
 - **Dieta**: Plantas, insetos, ovos
-- **Habilidades**: Versatilidade, garras
-- **Estilo de jogo**: Sobrevivente versátil
+- **Habilidades**: 
+  - **Deep Dive**: Mergulho prolongado
+  - **Manual Scratch**: Ataque rápido com garras
+- **Estilo de jogo**: Muito brincalhão e ágil na água. Consegue escapar de Deinosuchus pela manobrabilidade
+
+---
+
+## 💡 Dicas de Sobrevivência (Build 21811079)
+
+### Sistema de Dietas
+Comer os alimentos corretos (marcados no menu Tab) é essencial para o crescimento e para evitar debuffs de saúde. Cada dinossauro tem necessidades nutricionais específicas que devem ser atendidas.
+
+### Fraturas
+Se sofrer uma fratura na perna, sua velocidade será reduzida drasticamente. Use o comando de descanso (H) para curar mais rápido. Fraturas podem ser causadas por ataques específicos como o Headbutt do Pachycephalosaurus.
+
+### Night Vision (Visão Noturna)
+Use a tecla X para ativar a visão noturna. Carnívoros como o Dilophosaurus e Troodon têm alcance superior no escuro, tornando-os especialmente perigosos durante a noite.
 
 ---
 
