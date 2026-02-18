@@ -189,6 +189,39 @@ Bot-The-Isle-Evrima/
 └── README.md
 ```
 
+## 🎮 Integração com Servidor do Jogo (RCON)
+
+O bot pode se conectar ao servidor The Isle Evrima via RCON para aplicar mudanças em tempo real.
+
+### Como Funciona
+
+1. **Usuário solicita mudança** (Discord/Web) → `/changeskin tipo:Tyrannosaurus skin:rex_apex`
+2. **Bot valida permissões** → Verifica se o jogador possui a skin no banco de dados
+3. **Atualiza banco de dados** → Marca a skin como ativa
+4. **Envia comando RCON** → Se conectado, aplica no servidor: `changeskin username Tyrannosaurus rex_apex`
+
+### Identificação de Jogadores
+
+⚠️ **Importante:** O bot identifica jogadores no servidor usando o **username do Discord**.
+
+Para que a skin seja aplicada corretamente:
+- O nome no Discord deve ser igual ao nome no jogo
+- O jogador deve estar online no servidor
+- RCON deve estar configurado e conectado
+
+> 📖 **Para detalhes completos sobre comunicação bot-servidor, veja:** [SERVER_COMMUNICATION.md](SERVER_COMMUNICATION.md)
+
+### Configuração RCON (Opcional)
+
+No arquivo `.env`:
+```env
+GAME_SERVER_HOST=seu_servidor.com  # IP ou hostname do servidor
+GAME_SERVER_PORT=8888              # Porta RCON (padrão 8888)
+GAME_SERVER_PASSWORD=senha_secreta # Senha RCON do servidor
+```
+
+**Nota:** O bot funciona normalmente mesmo sem RCON configurado. As skins ficam salvas no banco de dados e podem ser aplicadas quando o servidor estiver disponível.
+
 ## 🔧 Configuração do Discord Bot
 
 1. Acesse o [Discord Developer Portal](https://discord.com/developers/applications)
@@ -284,6 +317,7 @@ O bot usa SQLite com as seguintes tabelas:
 
 - 📖 [DINOSAURS_REFERENCE.md](DINOSAURS_REFERENCE.md) - Guia completo de dinossauros com habilidades e estratégias
 - 🔌 [API.md](API.md) - Documentação completa da API REST
+- 🔗 [SERVER_COMMUNICATION.md](SERVER_COMMUNICATION.md) - Como o bot se comunica com o servidor do jogo
 - 🤝 [CONTRIBUTING.md](CONTRIBUTING.md) - Guia de contribuição para desenvolvedores
 - 🔒 [SECURITY.md](SECURITY.md) - Informações de segurança e melhores práticas
 - 📝 [CHANGELOG.md](CHANGELOG.md) - Histórico de versões e mudanças
