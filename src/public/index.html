@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Isle Evrima - Bot Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .status-bar {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff4444;
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.connected {
+            background: #44ff44;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+
+        .tab:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .tab.active {
+            background: rgba(255,255,255,0.3);
+            font-weight: bold;
+        }
+
+        .tab-content {
+            display: none;
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 10px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: #f44336;
+        }
+
+        .btn-danger:hover {
+            background: #da190b;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.15);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .card h3 {
+            margin-bottom: 10px;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message.success {
+            background: rgba(76, 175, 80, 0.3);
+            border: 2px solid #4CAF50;
+        }
+
+        .message.error {
+            background: rgba(244, 67, 54, 0.3);
+            border: 2px solid #f44336;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            opacity: 0.7;
+        }
+
+        .dinosaur-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+        }
+
+        .dino-type-btn {
+            padding: 10px;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .dino-type-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .dino-type-btn.selected {
+            border-color: #4CAF50;
+            background: rgba(76, 175, 80, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🦖 The Isle Evrima - Bot Manager</h1>
+
+        <div class="status-bar">
+            <div class="status-indicator">
+                <div class="status-dot" id="serverStatus"></div>
+                <span>Servidor do Jogo: <span id="serverStatusText">Desconectado</span></span>
+            </div>
+            <div class="input-group" style="margin: 0; max-width: 300px;">
+                <label for="discordIdInput">Discord ID:</label>
+                <input type="text" id="discordIdInput" placeholder="Seu Discord ID">
+            </div>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('garage')">Garagem</button>
+            <button class="tab" onclick="showTab('skins')">Skins</button>
+            <button class="tab" onclick="showTab('profile')">Perfil</button>
+        </div>
+
+        <div id="garageTab" class="tab-content active">
+            <h2>🏠 Garagem de Dinossauros</h2>
+            
+            <div class="input-group">
+                <label>Tipo de Dinossauro:</label>
+                <select id="dinoType">
+                    <optgroup label="Carnívoros">
+                        <option value="Carnotaurus">Carnotaurus</option>
+                        <option value="Omniraptor">Omniraptor</option>
+                        <option value="Ceratosaurus">Ceratosaurus</option>
+                        <option value="Troodon">Troodon</option>
+                        <option value="Dilophosaurus">Dilophosaurus</option>
+                        <option value="Pteranodon">Pteranodon</option>
+                        <option value="Herrerasaurus">Herrerasaurus</option>
+                        <option value="Deinosuchus">Deinosuchus</option>
+                        <option value="Allosaurus">Allosaurus</option>
+                        <option value="Tyrannosaurus">Tyrannosaurus rex</option>
+                    </optgroup>
+                    <optgroup label="Herbívoros">
+                        <option value="Stegosaurus">Stegosaurus</option>
+                        <option value="Tenontosaurus">Tenontosaurus</option>
+                        <option value="Hypsilophodon">Hypsilophodon</option>
+                        <option value="Pachycephalosaurus">Pachycephalosaurus</option>
+                        <option value="Diabloceratops">Diabloceratops</option>
+                        <option value="Dryosaurus">Dryosaurus</option>
+                        <option value="Maiasaura">Maiasaura</option>
+                        <option value="Triceratops">Triceratops</option>
+                    </optgroup>
+                    <optgroup label="Onívoros">
+                        <option value="Gallimimus">Gallimimus</option>
+                        <option value="Beipiaosaurus">Beipiaosaurus</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Nome do Dinossauro:</label>
+                <input type="text" id="dinoName" placeholder="Nome (opcional)">
+            </div>
+
+            <div class="input-group">
+                <label>Crescimento (0.0 - 1.0):</label>
+                <input type="number" id="dinoGrowth" min="0" max="1" step="0.1" value="1.0">
+            </div>
+
+            <button class="btn" onclick="storeDinosaur()">Armazenar na Garagem</button>
+
+            <h3 style="margin-top: 30px;">Dinossauros Armazenados:</h3>
+            <div id="garageList" class="card-grid"></div>
+        </div>
+
+        <div id="skinsTab" class="tab-content">
+            <h2>🎨 Gerenciador de Skins</h2>
+            
+            <div class="input-group">
+                <label>Tipo de Dinossauro:</label>
+                <select id="skinDinoType">
+                    <optgroup label="Carnívoros">
+                        <option value="Carnotaurus">Carnotaurus</option>
+                        <option value="Omniraptor">Omniraptor</option>
+                        <option value="Ceratosaurus">Ceratosaurus</option>
+                        <option value="Troodon">Troodon</option>
+                        <option value="Dilophosaurus">Dilophosaurus</option>
+                        <option value="Pteranodon">Pteranodon</option>
+                        <option value="Herrerasaurus">Herrerasaurus</option>
+                        <option value="Deinosuchus">Deinosuchus</option>
+                        <option value="Allosaurus">Allosaurus</option>
+                        <option value="Tyrannosaurus">Tyrannosaurus rex</option>
+                    </optgroup>
+                    <optgroup label="Herbívoros">
+                        <option value="Stegosaurus">Stegosaurus</option>
+                        <option value="Tenontosaurus">Tenontosaurus</option>
+                        <option value="Hypsilophodon">Hypsilophodon</option>
+                        <option value="Pachycephalosaurus">Pachycephalosaurus</option>
+                        <option value="Diabloceratops">Diabloceratops</option>
+                        <option value="Dryosaurus">Dryosaurus</option>
+                        <option value="Maiasaura">Maiasaura</option>
+                        <option value="Triceratops">Triceratops</option>
+                    </optgroup>
+                    <optgroup label="Onívoros">
+                        <option value="Gallimimus">Gallimimus</option>
+                        <option value="Beipiaosaurus">Beipiaosaurus</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>ID da Skin:</label>
+                <input type="text" id="skinId" placeholder="ex: skin_001">
+            </div>
+
+            <div class="input-group">
+                <label>Nome da Skin:</label>
+                <input type="text" id="skinName" placeholder="Nome da skin">
+            </div>
+
+            <button class="btn" onclick="unlockSkin()">Desbloquear Skin</button>
+
+            <h3 style="margin-top: 30px;">Skins Disponíveis:</h3>
+            <div id="skinsList" class="card-grid"></div>
+        </div>
+
+        <div id="profileTab" class="tab-content">
+            <h2>👤 Perfil do Jogador</h2>
+            <div id="profileInfo"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentDiscordId = '';
+
+        function showTab(tabName) {
+            const clickedTab = event ? event.target : document.querySelector('.tab.active');
+            
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            if (clickedTab) clickedTab.classList.add('active');
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            
+            if (currentDiscordId) {
+                if (tabName === 'garage') loadGarage();
+                if (tabName === 'skins') loadSkins();
+                if (tabName === 'profile') loadProfile();
+            }
+        }
+
+        function showMessage(text, type) {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = 'message ' + type;
+            msg.style.display = 'block';
+            setTimeout(() => msg.style.display = 'none', 5000);
+        }
+
+        async function checkServerStatus() {
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+                
+                const statusDot = document.getElementById('serverStatus');
+                const statusText = document.getElementById('serverStatusText');
+                
+                if (data.gameServerConnected) {
+                    statusDot.classList.add('connected');
+                    statusText.textContent = 'Conectado';
+                } else {
+                    statusDot.classList.remove('connected');
+                    statusText.textContent = 'Desconectado';
+                }
+            } catch (error) {
+                console.error('Erro ao verificar status:', error);
+            }
+        }
+
+        async function loadGarage() {
+            if (!currentDiscordId) return;
+            
+            try {
+                const response = await fetch(`/api/garage/${currentDiscordId}`);
+                const garage = await response.json();
+                
+                const list = document.getElementById('garageList');
+                
+                if (garage.length === 0) {
+                    list.innerHTML = '<div class="empty-state">Nenhum dinossauro armazenado</div>';
+                    return;
+                }
+                
+                list.innerHTML = garage.map(dino => `
+                    <div class="card">
+                        <h3>${dino.dinosaur_type}</h3>
+                        <p><strong>Nome:</strong> ${dino.dinosaur_name || 'Sem nome'}</p>
+                        <p><strong>Crescimento:</strong> ${(dino.growth_stage * 100).toFixed(0)}%</p>
+                        <p><strong>Armazenado:</strong> ${new Date(dino.stored_at).toLocaleDateString('pt-BR')}</p>
+                        <button class="btn btn-danger" style="margin-top: 10px;" onclick="removeDinosaur(${dino.id})">Remover</button>
+                    </div>
+                `).join('');
+            } catch (error) {
+                showMessage('Erro ao carregar garagem', 'error');
+            }
+        }
+
+        async function storeDinosaur() {
+            if (!currentDiscordId) {
+                showMessage('Por favor, insira seu Discord ID', 'error');
+                return;
+            }
+            
+            const type = document.getElementById('dinoType').value;
+            const name = document.getElementById('dinoName').value;
+            const growth = parseFloat(document.getElementById('dinoGrowth').value);
+            
+            try {
+                const response = await fetch('/api/garage', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        discordId: currentDiscordId,
+                        dinosaurType: type,
+                        dinosaurName: name || 'Sem nome',
+                        growthStage: growth,
+                        stats: {}
+                    })
+                });
+                
+                const data = await response.json();
+                showMessage(data.message, 'success');
+                loadGarage();
+            } catch (error) {
+                showMessage('Erro ao armazenar dinossauro', 'error');
+            }
+        }
+
+        async function removeDinosaur(id) {
+            if (!confirm('Tem certeza que deseja remover este dinossauro?')) return;
+            
+            try {
+                const response = await fetch(`/api/garage/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                const data = await response.json();
+                showMessage(data.message, 'success');
+                loadGarage();
+            } catch (error) {
+                showMessage('Erro ao remover dinossauro', 'error');
+            }
+        }
+
+        async function loadSkins() {
+            if (!currentDiscordId) return;
+            
+            try {
+                const response = await fetch(`/api/skins/${currentDiscordId}`);
+                const skins = await response.json();
+                
+                const list = document.getElementById('skinsList');
+                
+                if (skins.length === 0) {
+                    list.innerHTML = '<div class="empty-state">Nenhuma skin desbloqueada</div>';
+                    return;
+                }
+                
+                list.innerHTML = skins.map(skin => `
+                    <div class="card">
+                        <h3>${skin.skin_name || skin.skin_id}</h3>
+                        <p><strong>Tipo:</strong> ${skin.dinosaur_type}</p>
+                        <p><strong>ID:</strong> ${skin.skin_id}</p>
+                        <button class="btn" style="margin-top: 10px;" onclick="applySkin('${skin.dinosaur_type}', '${skin.skin_id}')">Aplicar</button>
+                    </div>
+                `).join('');
+            } catch (error) {
+                showMessage('Erro ao carregar skins', 'error');
+            }
+        }
+
+        async function unlockSkin() {
+            if (!currentDiscordId) {
+                showMessage('Por favor, insira seu Discord ID', 'error');
+                return;
+            }
+            
+            const type = document.getElementById('skinDinoType').value;
+            const skinId = document.getElementById('skinId').value;
+            const skinName = document.getElementById('skinName').value;
+            
+            if (!skinId) {
+                showMessage('Por favor, insira o ID da skin', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/skins/unlock', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        discordId: currentDiscordId,
+                        dinosaurType: type,
+                        skinId: skinId,
+                        skinName: skinName || skinId,
+                        skinData: {}
+                    })
+                });
+                
+                const data = await response.json();
+                showMessage(data.message, 'success');
+                loadSkins();
+            } catch (error) {
+                showMessage('Erro ao desbloquear skin', 'error');
+            }
+        }
+
+        async function applySkin(dinosaurType, skinId) {
+            if (!currentDiscordId) return;
+            
+            try {
+                const response = await fetch('/api/skins/apply', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        discordId: currentDiscordId,
+                        dinosaurType: dinosaurType,
+                        skinId: skinId
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showMessage(data.message, 'success');
+                } else {
+                    showMessage(data.error, 'error');
+                }
+            } catch (error) {
+                showMessage('Erro ao aplicar skin', 'error');
+            }
+        }
+
+        async function loadProfile() {
+            if (!currentDiscordId) return;
+            
+            try {
+                const [playerResponse, garageResponse, skinsResponse] = await Promise.all([
+                    fetch(`/api/player/${currentDiscordId}`),
+                    fetch(`/api/garage/${currentDiscordId}`),
+                    fetch(`/api/skins/${currentDiscordId}`)
+                ]);
+                
+                const player = await playerResponse.json();
+                const garage = await garageResponse.json();
+                const skins = await skinsResponse.json();
+                
+                const profileInfo = document.getElementById('profileInfo');
+                profileInfo.innerHTML = `
+                    <div class="card">
+                        <h3>Informações do Jogador</h3>
+                        <p><strong>Nome:</strong> ${player.username}</p>
+                        <p><strong>Discord ID:</strong> ${player.discord_id}</p>
+                        <p><strong>Steam ID:</strong> ${player.steam_id || 'Não vinculado'}</p>
+                        <p><strong>Membro desde:</strong> ${new Date(player.created_at).toLocaleDateString('pt-BR')}</p>
+                    </div>
+                    <div class="card">
+                        <h3>Estatísticas</h3>
+                        <p><strong>Dinossauros na Garagem:</strong> ${garage.length}</p>
+                        <p><strong>Skins Desbloqueadas:</strong> ${skins.length}</p>
+                    </div>
+                `;
+            } catch (error) {
+                showMessage('Erro ao carregar perfil', 'error');
+            }
+        }
+
+        document.getElementById('discordIdInput').addEventListener('change', (e) => {
+            currentDiscordId = e.target.value;
+            if (currentDiscordId) {
+                loadGarage();
+            }
+        });
+
+        // Verificar status do servidor a cada 10 segundos
+        setInterval(checkServerStatus, 10000);
+        checkServerStatus();
+    </script>
+</body>
+</html>

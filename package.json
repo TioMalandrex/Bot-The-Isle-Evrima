@@ -1,0 +1,25 @@
+{
+  "name": "bot-the-isle-evrima",
+  "version": "1.1.0",
+  "description": "Bot para The Isle Evrima com comunicação entre Servidor, Discord e Site - Build 21811079 compatível",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "node tests/database.test.js"
+  },
+  "keywords": ["the-isle", "evrima", "discord-bot", "game-server"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^14.14.1",
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.7",
+    "dotenv": "^16.3.1",
+    "rcon-client": "^4.2.3",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
