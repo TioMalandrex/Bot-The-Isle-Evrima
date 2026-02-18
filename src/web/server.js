@@ -24,9 +24,9 @@ class WebServer {
     // API Routes
     
     // Players
-    this.app.get('/api/player/:discordId', (req, res) => {
+    this.app.get('/api/player/:discordId', async (req, res) => {
       try {
-        const player = this.database.getPlayer(req.params.discordId);
+        const player = await this.database.getPlayer(req.params.discordId);
         if (!player) {
           return res.status(404).json({ error: 'Jogador não encontrado' });
         }
@@ -37,25 +37,25 @@ class WebServer {
     });
 
     // Garage
-    this.app.get('/api/garage/:discordId', (req, res) => {
+    this.app.get('/api/garage/:discordId', async (req, res) => {
       try {
-        const player = this.database.getPlayer(req.params.discordId);
+        const player = await this.database.getPlayer(req.params.discordId);
         if (!player) {
           return res.status(404).json({ error: 'Jogador não encontrado' });
         }
-        const garage = this.database.getGarage(player.id);
+        const garage = await this.database.getGarage(player.id);
         res.json(garage);
       } catch (error) {
         res.status(500).json({ error: error.message });
       }
     });
 
-    this.app.post('/api/garage', (req, res) => {
+    this.app.post('/api/garage', async (req, res) => {
       try {
         const { discordId, dinosaurType, dinosaurName, growthStage, stats } = req.body;
         
-        const player = this.database.getOrCreatePlayer(discordId, 'WebUser');
-        this.database.storeInGarage(player.id, dinosaurType, dinosaurName, growthStage || 1.0, stats || {});
+        const player = await this.database.getOrCreatePlayer(discordId, 'WebUser');
+        await this.database.storeInGarage(player.id, dinosaurType, dinosaurName, growthStage || 1.0, stats || {});
         
         res.json({ success: true, message: 'Dinossauro armazenado com sucesso' });
       } catch (error) {
@@ -63,9 +63,9 @@ class WebServer {
       }
     });
 
-    this.app.delete('/api/garage/:id', (req, res) => {
+    this.app.delete('/api/garage/:id', async (req, res) => {
       try {
-        this.database.deleteFromGarage(req.params.id);
+        await this.database.deleteFromGarage(req.params.id);
         res.json({ success: true, message: 'Dinossauro removido da garagem' });
       } catch (error) {
         res.status(500).json({ error: error.message });
@@ -73,26 +73,26 @@ class WebServer {
     });
 
     // Skins
-    this.app.get('/api/skins/:discordId', (req, res) => {
+    this.app.get('/api/skins/:discordId', async (req, res) => {
       try {
-        const player = this.database.getPlayer(req.params.discordId);
+        const player = await this.database.getPlayer(req.params.discordId);
         if (!player) {
           return res.status(404).json({ error: 'Jogador não encontrado' });
         }
         const dinosaurType = req.query.type;
-        const skins = this.database.getPlayerSkins(player.id, dinosaurType);
+        const skins = await this.database.getPlayerSkins(player.id, dinosaurType);
         res.json(skins);
       } catch (error) {
         res.status(500).json({ error: error.message });
       }
     });
 
-    this.app.post('/api/skins/unlock', (req, res) => {
+    this.app.post('/api/skins/unlock', async (req, res) => {
       try {
         const { discordId, dinosaurType, skinId, skinName, skinData } = req.body;
         
-        const player = this.database.getOrCreatePlayer(discordId, 'WebUser');
-        this.database.unlockSkin(player.id, dinosaurType, skinId, skinName, skinData || {});
+        const player = await this.database.getOrCreatePlayer(discordId, 'WebUser');
+        await this.database.unlockSkin(player.id, dinosaurType, skinId, skinName, skinData || {});
         
         res.json({ success: true, message: 'Skin desbloqueada com sucesso' });
       } catch (error) {
@@ -104,13 +104,13 @@ class WebServer {
       try {
         const { discordId, dinosaurType, skinId } = req.body;
         
-        const player = this.database.getPlayer(discordId);
+        const player = await this.database.getPlayer(discordId);
         if (!player) {
           return res.status(404).json({ error: 'Jogador não encontrado' });
         }
         
         // Verificar se o jogador possui a skin
-        const skins = this.database.getPlayerSkins(player.id, dinosaurType);
+        const skins = await this.database.getPlayerSkins(player.id, dinosaurType);
         const hasSkin = skins.some(s => s.skin_id === skinId);
         
         if (!hasSkin) {
@@ -118,7 +118,7 @@ class WebServer {
         }
         
         // Aplicar a skin
-        this.database.setActiveSkin(player.id, dinosaurType, skinId);
+        await this.database.setActiveSkin(player.id, dinosaurType, skinId);
         
         // Tentar aplicar no servidor
         if (this.gameServer.isConnected()) {
@@ -135,13 +135,13 @@ class WebServer {
       }
     });
 
-    this.app.get('/api/skins/active/:discordId/:dinosaurType', (req, res) => {
+    this.app.get('/api/skins/active/:discordId/:dinosaurType', async (req, res) => {
       try {
-        const player = this.database.getPlayer(req.params.discordId);
+        const player = await this.database.getPlayer(req.params.discordId);
         if (!player) {
           return res.status(404).json({ error: 'Jogador não encontrado' });
         }
-        const activeSkin = this.database.getActiveSkin(player.id, req.params.dinosaurType);
+        const activeSkin = await this.database.getActiveSkin(player.id, req.params.dinosaurType);
         res.json(activeSkin || {});
       } catch (error) {
         res.status(500).json({ error: error.message });
