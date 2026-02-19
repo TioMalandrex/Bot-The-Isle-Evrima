@@ -154,10 +154,16 @@ http://localhost:3000
 
 Comandos disponíveis:
 
+**🆕 Menu Interativo (Recomendado!):**
+- `/menu` - 🦖 **Menu interativo com botões** para gerenciar dinossauros
+  - **💾 Guardar Atual** - Detecta e guarda automaticamente seu dino atual via RCON
+  - **📦 Ver Garagem** - Mostra todos os dinos com stats completas (vida, fome, sede, localização, mutações)
+  - **🔄 Recuperar Dino** - Menu dropdown para escolher e recuperar dino
+
 **Jogador:**
 - `/link <steamid>` - Vincular seu Discord ao seu Steam ID
 - `/garage` - Ver seus dinossauros armazenados na garagem
-- `/store <tipo> [nome] [crescimento]` - Armazenar um dinossauro na garagem
+- `/store <tipo> [nome] [crescimento]` - Armazenar um dinossauro na garagem (manual)
 - `/retrieve <id>` - Recuperar um dinossauro da garagem
 - `/skins [tipo]` - Ver suas skins disponíveis
 - `/changeskin <tipo> <skin>` - Mudar a skin de um dinossauro
@@ -178,14 +184,33 @@ Comandos disponíveis:
 
 **Exemplos de uso:**
 ```
+# Sistema Interativo (Recomendado)
+/menu
+[Clique em "💾 Guardar Atual" para detectar e guardar automaticamente]
+[Clique em "📦 Ver Garagem" para ver todos com detalhes completos]
+[Clique em "🔄 Recuperar Dino" para menu dropdown]
+
+# Comandos tradicionais
 /link steamid:76561198012345678
-/store tipo:Tyrannosaurus nome:Rexy crescimento:1.0
-/changeskin tipo:Tyrannosaurus skin:rex_apex
 /balance
 /daily
 /transfer @amigo 50
 /leaderboard tipo:kills
 ```
+
+### Sistema de Detecção Automática
+
+O bot agora detecta automaticamente seu dinossauro atual via RCON, incluindo:
+- **Tipo** (Carnotaurus, Tyrannosaurus, etc.)
+- **Crescimento** (0-100%)
+- **❤️ Vida** (Health)
+- **🍖 Fome** (Hunger)
+- **💧 Sede** (Thirst)
+- **⚡ Stamina**
+- **📍 Localização** (X, Y, Z no mapa)
+- **🧬 Mutações** (características especiais)
+
+Veja [AUTO_DETECTION.md](AUTO_DETECTION.md) para guia completo.
 
 ### Interface Web
 
