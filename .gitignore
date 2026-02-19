@@ -16,3 +16,4 @@ tests/*.db
 coverage/
 dist/
 build/
+screenshots/
