@@ -33,6 +33,15 @@ class DatabaseManager {
           dinosaur_name TEXT,
           growth_stage REAL DEFAULT 0.0,
           stats TEXT,
+          health REAL DEFAULT 100.0,
+          hunger REAL DEFAULT 100.0,
+          thirst REAL DEFAULT 100.0,
+          stamina REAL DEFAULT 100.0,
+          location_x REAL,
+          location_y REAL,
+          location_z REAL,
+          mutations TEXT,
+          current_dino BOOLEAN DEFAULT 0,
           stored_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           FOREIGN KEY (player_id) REFERENCES players(id)
         )
@@ -169,6 +178,42 @@ class DatabaseManager {
         INSERT INTO garage (player_id, dinosaur_type, dinosaur_name, growth_stage, stats) 
         VALUES (?, ?, ?, ?, ?)
       `, [playerId, dinosaurType, dinosaurName, growthStage, JSON.stringify(stats)], function(err) {
+        if (err) reject(err);
+        else resolve(this.lastID);
+      });
+    });
+  }
+
+  /**
+   * Armazena dinossauro com estatísticas completas (health, hunger, thirst, location, etc)
+   * @param {number} playerId - ID do jogador
+   * @param {Object} dinoData - Dados completos do dinossauro
+   */
+  storeInGarageWithStats(playerId, dinoData) {
+    return new Promise((resolve, reject) => {
+      this.db.run(`
+        INSERT INTO garage (
+          player_id, dinosaur_type, dinosaur_name, growth_stage, stats,
+          health, hunger, thirst, stamina,
+          location_x, location_y, location_z,
+          mutations, current_dino
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `, [
+        playerId,
+        dinoData.dinosaur_type || 'Unknown',
+        dinoData.dinosaur_name || 'Sem nome',
+        dinoData.growth || 1.0,
+        JSON.stringify(dinoData.stats || {}),
+        dinoData.health || 100,
+        dinoData.hunger || 100,
+        dinoData.thirst || 100,
+        dinoData.stamina || 100,
+        dinoData.location?.x || 0,
+        dinoData.location?.y || 0,
+        dinoData.location?.z || 0,
+        JSON.stringify(dinoData.mutations || []),
+        0 // current_dino = false quando armazenado
+      ], function(err) {
         if (err) reject(err);
         else resolve(this.lastID);
       });

@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits, EmbedBuilder, SlashCommandBuilder } = require('discord.js');
+const { Client, GatewayIntentBits, EmbedBuilder, SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder } = require('discord.js');
 
 class DiscordBot {
   constructor(token, database, gameServer) {
@@ -23,11 +23,24 @@ class DiscordBot {
     });
 
     this.client.on('interactionCreate', async interaction => {
-      if (!interaction.isChatInputCommand()) return;
-
-      const { commandName } = interaction;
-
       try {
+        // Handle button interactions
+        if (interaction.isButton()) {
+          await this.handleButtonInteraction(interaction);
+          return;
+        }
+
+        // Handle select menu interactions
+        if (interaction.isStringSelectMenu()) {
+          await this.handleSelectMenuInteraction(interaction);
+          return;
+        }
+
+        // Handle slash commands
+        if (!interaction.isChatInputCommand()) return;
+
+        const { commandName } = interaction;
+
         switch (commandName) {
           case 'garage':
             await this.handleGarageCommand(interaction);
@@ -79,13 +92,22 @@ class DiscordBot {
           case 'stats':
             await this.handleStatsCommand(interaction);
             break;
+          // Novo comando de menu interativo
+          case 'menu':
+            await this.handleMenuCommand(interaction);
+            break;
         }
       } catch (error) {
-        console.error('Erro ao processar comando:', error);
-        await interaction.reply({
-          content: 'Erro ao processar comando. Tente novamente.',
+        console.error('Erro ao processar interação:', error);
+        const errorMsg = {
+          content: 'Erro ao processar interação. Tente novamente.',
           ephemeral: true
-        });
+        };
+        if (interaction.replied || interaction.deferred) {
+          await interaction.editReply(errorMsg);
+        } else {
+          await interaction.reply(errorMsg);
+        }
       }
     });
   }
@@ -234,7 +256,11 @@ class DiscordBot {
       
       new SlashCommandBuilder()
         .setName('stats')
-        .setDescription('Ver suas estatísticas de jogo')
+        .setDescription('Ver suas estatísticas de jogo'),
+      
+      new SlashCommandBuilder()
+        .setName('menu')
+        .setDescription('🦖 Menu interativo de gerenciamento de dinossauros')
     ];
   }
 
@@ -761,6 +787,311 @@ class DiscordBot {
     }
     
     await interaction.editReply({ embeds: [embed] });
+  }
+
+  // ===== Novo Menu Interativo =====
+
+  async handleMenuCommand(interaction) {
+    await interaction.deferReply();
+
+    const player = await this.database.getOrCreatePlayer(
+      interaction.user.id,
+      interaction.user.username
+    );
+
+    const embed = new EmbedBuilder()
+      .setTitle('🦖 Menu de Gerenciamento de Dinossauros')
+      .setColor('#00ff00')
+      .setDescription('Escolha uma ação abaixo para gerenciar seus dinossauros:')
+      .addFields(
+        { name: '💾 Guardar', value: 'Guarda automaticamente seu dinossauro atual', inline: true },
+        { name: '📦 Ver Garagem', value: 'Veja todos os seus dinos guardados', inline: true },
+        { name: '🔄 Recuperar', value: 'Escolha um dino para recuperar', inline: true }
+      );
+
+    const row = new ActionRowBuilder()
+      .addComponents(
+        new ButtonBuilder()
+          .setCustomId('store_current_dino')
+          .setLabel('💾 Guardar Atual')
+          .setStyle(ButtonStyle.Success),
+        new ButtonBuilder()
+          .setCustomId('view_garage')
+          .setLabel('📦 Ver Garagem')
+          .setStyle(ButtonStyle.Primary),
+        new ButtonBuilder()
+          .setCustomId('retrieve_dino')
+          .setLabel('🔄 Recuperar Dino')
+          .setStyle(ButtonStyle.Secondary)
+      );
+
+    await interaction.editReply({ embeds: [embed], components: [row] });
+  }
+
+  async handleButtonInteraction(interaction) {
+    const customId = interaction.customId;
+
+    if (customId === 'store_current_dino') {
+      await this.handleStoreCurrentDino(interaction);
+    } else if (customId === 'view_garage') {
+      await this.handleViewGarageInteraction(interaction);
+    } else if (customId === 'retrieve_dino') {
+      await this.handleRetrieveDinoInteraction(interaction);
+    } else if (customId.startsWith('retrieve_')) {
+      await this.handleConfirmRetrieve(interaction);
+    }
+  }
+
+  async handleSelectMenuInteraction(interaction) {
+    if (interaction.customId === 'select_dino_retrieve') {
+      await this.handleDinoSelection(interaction);
+    }
+  }
+
+  async handleStoreCurrentDino(interaction) {
+    await interaction.deferReply({ ephemeral: true });
+
+    const player = await this.database.getOrCreatePlayer(
+      interaction.user.id,
+      interaction.user.username
+    );
+
+    if (!player.steam_id) {
+      await interaction.editReply({
+        content: '❌ Você precisa vincular seu Steam ID primeiro usando `/link`'
+      });
+      return;
+    }
+
+    if (!this.gameServer.isConnected()) {
+      await interaction.editReply({
+        content: '❌ Servidor do jogo não está conectado. Não é possível detectar seu dinossauro atual.'
+      });
+      return;
+    }
+
+    try {
+      // Obter dados do dinossauro atual via RCON
+      const dinoData = await this.gameServer.getCurrentDinosaur(player.steam_id);
+
+      if (!dinoData || !dinoData.dinosaur_type) {
+        await interaction.editReply({
+          content: '❌ Não foi possível detectar seu dinossauro atual. Você está jogando no servidor?'
+        });
+        return;
+      }
+
+      // Armazenar com todas as informações
+      await this.database.storeInGarageWithStats(player.id, dinoData);
+
+      const embed = new EmbedBuilder()
+        .setTitle('✅ Dinossauro Armazenado')
+        .setColor('#00ff00')
+        .setDescription(`Seu **${dinoData.dinosaur_type}** foi guardado com sucesso!`)
+        .addFields(
+          { name: 'Crescimento', value: `${(dinoData.growth * 100).toFixed(0)}%`, inline: true },
+          { name: 'Vida', value: `${dinoData.health?.toFixed(0) || 'N/A'}`, inline: true },
+          { name: 'Fome', value: `${dinoData.hunger?.toFixed(0) || 'N/A'}`, inline: true },
+          { name: 'Sede', value: `${dinoData.thirst?.toFixed(0) || 'N/A'}`, inline: true },
+          { name: 'Stamina', value: `${dinoData.stamina?.toFixed(0) || 'N/A'}`, inline: true }
+        );
+
+      if (dinoData.location && dinoData.location.x !== null) {
+        embed.addFields({
+          name: 'Localização',
+          value: `X: ${dinoData.location.x.toFixed(0)}, Y: ${dinoData.location.y.toFixed(0)}, Z: ${dinoData.location.z.toFixed(0)}`,
+          inline: false
+        });
+      }
+
+      await interaction.editReply({ embeds: [embed] });
+    } catch (error) {
+      console.error('Erro ao guardar dinossauro:', error);
+      await interaction.editReply({
+        content: '❌ Erro ao guardar dinossauro. Tente novamente.'
+      });
+    }
+  }
+
+  async handleViewGarageInteraction(interaction) {
+    await interaction.deferReply({ ephemeral: true });
+
+    const player = await this.database.getOrCreatePlayer(
+      interaction.user.id,
+      interaction.user.username
+    );
+
+    const garage = await this.database.getGarage(player.id);
+
+    if (garage.length === 0) {
+      await interaction.editReply({
+        content: '📦 Sua garagem está vazia. Use o botão "Guardar Atual" para salvar um dinossauro.'
+      });
+      return;
+    }
+
+    const embed = new EmbedBuilder()
+      .setTitle('🦖 Sua Garagem')
+      .setColor('#00ff00')
+      .setDescription(`Você tem ${garage.length} dinossauro(s) armazenado(s):`);
+
+    garage.forEach((dino, index) => {
+      const mutationsArray = dino.mutations ? JSON.parse(dino.mutations) : [];
+      const mutationsText = mutationsArray.length > 0 ? mutationsArray.join(', ') : 'Nenhuma';
+      
+      embed.addFields({
+        name: `#${dino.id} - ${dino.dinosaur_type}`,
+        value: [
+          `**Nome:** ${dino.dinosaur_name || 'Sem nome'}`,
+          `**Crescimento:** ${(dino.growth_stage * 100).toFixed(0)}%`,
+          `**Vida:** ${dino.health?.toFixed(0) || 'N/A'} | **Fome:** ${dino.hunger?.toFixed(0) || 'N/A'} | **Sede:** ${dino.thirst?.toFixed(0) || 'N/A'}`,
+          `**Localização:** X:${dino.location_x?.toFixed(0) || 0}, Y:${dino.location_y?.toFixed(0) || 0}, Z:${dino.location_z?.toFixed(0) || 0}`,
+          `**Mutações:** ${mutationsText}`,
+          `**Armazenado:** ${new Date(dino.stored_at).toLocaleDateString('pt-BR')}`
+        ].join('\n'),
+        inline: false
+      });
+    });
+
+    await interaction.editReply({ embeds: [embed] });
+  }
+
+  async handleRetrieveDinoInteraction(interaction) {
+    await interaction.deferReply({ ephemeral: true });
+
+    const player = await this.database.getOrCreatePlayer(
+      interaction.user.id,
+      interaction.user.username
+    );
+
+    const garage = await this.database.getGarage(player.id);
+
+    if (garage.length === 0) {
+      await interaction.editReply({
+        content: '📦 Sua garagem está vazia. Não há dinossauros para recuperar.'
+      });
+      return;
+    }
+
+    // Criar select menu com os dinos disponíveis
+    const options = garage.map(dino => ({
+      label: `${dino.dinosaur_type} - ${dino.dinosaur_name || 'Sem nome'}`,
+      description: `Growth: ${(dino.growth_stage * 100).toFixed(0)}% | HP: ${dino.health?.toFixed(0) || 'N/A'} | ID: ${dino.id}`,
+      value: `dino_${dino.id}`
+    }));
+
+    const selectMenu = new StringSelectMenuBuilder()
+      .setCustomId('select_dino_retrieve')
+      .setPlaceholder('Escolha um dinossauro para recuperar')
+      .addOptions(options.slice(0, 25)); // Discord limit: 25 options
+
+    const row = new ActionRowBuilder()
+      .addComponents(selectMenu);
+
+    const embed = new EmbedBuilder()
+      .setTitle('🔄 Recuperar Dinossauro')
+      .setColor('#ffa500')
+      .setDescription('Selecione o dinossauro que deseja recuperar da garagem:');
+
+    await interaction.editReply({ embeds: [embed], components: [row] });
+  }
+
+  async handleDinoSelection(interaction) {
+    await interaction.deferUpdate();
+
+    const dinoId = parseInt(interaction.values[0].replace('dino_', ''));
+    
+    // Buscar informações do dino
+    const garage = await this.database.getGarage(interaction.user.id);
+    const dino = garage.find(d => d.id === dinoId);
+
+    if (!dino) {
+      await interaction.editReply({
+        content: '❌ Dinossauro não encontrado.',
+        components: []
+      });
+      return;
+    }
+
+    const mutationsArray = dino.mutations ? JSON.parse(dino.mutations) : [];
+    const mutationsText = mutationsArray.length > 0 ? mutationsArray.join(', ') : 'Nenhuma';
+
+    const embed = new EmbedBuilder()
+      .setTitle(`🦖 ${dino.dinosaur_type}`)
+      .setColor('#ffa500')
+      .setDescription(`**${dino.dinosaur_name || 'Sem nome'}**`)
+      .addFields(
+        { name: 'Crescimento', value: `${(dino.growth_stage * 100).toFixed(0)}%`, inline: true },
+        { name: 'Vida', value: `${dino.health?.toFixed(0) || 'N/A'}`, inline: true },
+        { name: 'Stamina', value: `${dino.stamina?.toFixed(0) || 'N/A'}`, inline: true },
+        { name: 'Fome', value: `${dino.hunger?.toFixed(0) || 'N/A'}`, inline: true },
+        { name: 'Sede', value: `${dino.thirst?.toFixed(0) || 'N/A'}`, inline: true },
+        { name: 'Localização', value: `X:${dino.location_x?.toFixed(0) || 0}, Y:${dino.location_y?.toFixed(0) || 0}, Z:${dino.location_z?.toFixed(0) || 0}`, inline: false },
+        { name: 'Mutações', value: mutationsText, inline: false },
+        { name: 'Armazenado em', value: new Date(dino.stored_at).toLocaleString('pt-BR'), inline: false }
+      );
+
+    const confirmButton = new ButtonBuilder()
+      .setCustomId(`retrieve_confirm_${dinoId}`)
+      .setLabel('✅ Confirmar Recuperação')
+      .setStyle(ButtonStyle.Success);
+
+    const cancelButton = new ButtonBuilder()
+      .setCustomId('retrieve_cancel')
+      .setLabel('❌ Cancelar')
+      .setStyle(ButtonStyle.Danger);
+
+    const row = new ActionRowBuilder()
+      .addComponents(confirmButton, cancelButton);
+
+    await interaction.editReply({ embeds: [embed], components: [row] });
+  }
+
+  async handleConfirmRetrieve(interaction) {
+    if (interaction.customId === 'retrieve_cancel') {
+      await interaction.update({
+        content: '❌ Recuperação cancelada.',
+        embeds: [],
+        components: []
+      });
+      return;
+    }
+
+    const dinoId = parseInt(interaction.customId.replace('retrieve_confirm_', ''));
+    
+    await interaction.deferUpdate();
+
+    try {
+      const item = await this.database.retrieveFromGarage(dinoId);
+
+      if (!item) {
+        await interaction.editReply({
+          content: '❌ Dinossauro não encontrado.',
+          embeds: [],
+          components: []
+        });
+        return;
+      }
+
+      const embed = new EmbedBuilder()
+        .setTitle('✅ Dinossauro Recuperado')
+        .setColor('#00ff00')
+        .setDescription(`**${item.dinosaur_type}** (${item.dinosaur_name}) foi recuperado da garagem!`)
+        .addFields(
+          { name: 'Crescimento', value: `${(item.growth_stage * 100).toFixed(0)}%`, inline: true },
+          { name: 'Vida', value: `${item.health?.toFixed(0) || 'N/A'}`, inline: true },
+          { name: 'Fome', value: `${item.hunger?.toFixed(0) || 'N/A'}`, inline: true }
+        );
+
+      await interaction.editReply({ embeds: [embed], components: [] });
+    } catch (error) {
+      console.error('Erro ao recuperar dinossauro:', error);
+      await interaction.editReply({
+        content: '❌ Erro ao recuperar dinossauro.',
+        embeds: [],
+        components: []
+      });
+    }
   }
 
   async start() {

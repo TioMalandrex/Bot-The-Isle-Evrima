@@ -110,12 +110,91 @@ class GameServerManager {
   }
 
   /**
-   * Obtém dados de um jogador específico ou todos os jogadores
+   * Obtém dados detalhados de um jogador específico ou todos os jogadores
    * @param {string} steamId - Steam ID do jogador (opcional)
+   * @returns {Promise<Object>} Dados do jogador parseados
    */
   async getPlayerData(steamId = '') {
     const command = steamId ? `getplayerdata ${steamId}` : `getplayerdata`;
-    return await this.sendCommand(command);
+    const response = await this.sendCommand(command);
+    return this.parsePlayerData(response);
+  }
+
+  /**
+   * Parse dos dados do jogador retornados pelo RCON
+   * @param {string} response - Resposta do comando getplayerdata
+   * @returns {Object} Dados parseados
+   */
+  parsePlayerData(response) {
+    try {
+      // O RCON pode retornar JSON ou texto formatado
+      // Tenta parsear como JSON primeiro
+      if (response && response.trim().startsWith('{')) {
+        return JSON.parse(response);
+      }
+      
+      // Se não for JSON, tenta extrair informações do texto
+      const data = {
+        dinosaur_type: null,
+        growth: null,
+        health: null,
+        hunger: null,
+        thirst: null,
+        stamina: null,
+        location: { x: null, y: null, z: null },
+        mutations: []
+      };
+
+      // Extrair tipo de dinossauro
+      const dinoMatch = response.match(/Dinosaur[:\s]+([^\n,]+)/i) || 
+                       response.match(/Species[:\s]+([^\n,]+)/i);
+      if (dinoMatch) data.dinosaur_type = dinoMatch[1].trim();
+
+      // Extrair growth
+      const growthMatch = response.match(/Growth[:\s]+([\d.]+)/i);
+      if (growthMatch) data.growth = parseFloat(growthMatch[1]);
+
+      // Extrair health
+      const healthMatch = response.match(/Health[:\s]+([\d.]+)/i);
+      if (healthMatch) data.health = parseFloat(healthMatch[1]);
+
+      // Extrair hunger
+      const hungerMatch = response.match(/Hunger[:\s]+([\d.]+)/i);
+      if (hungerMatch) data.hunger = parseFloat(hungerMatch[1]);
+
+      // Extrair thirst
+      const thirstMatch = response.match(/Thirst[:\s]+([\d.]+)/i);
+      if (thirstMatch) data.thirst = parseFloat(thirstMatch[1]);
+
+      // Extrair stamina
+      const staminaMatch = response.match(/Stamina[:\s]+([\d.]+)/i);
+      if (staminaMatch) data.stamina = parseFloat(staminaMatch[1]);
+
+      // Extrair localização
+      const locationMatch = response.match(/Location[:\s]+\(?([^)]+)\)?/i) ||
+                           response.match(/Position[:\s]+\(?([^)]+)\)?/i);
+      if (locationMatch) {
+        const coords = locationMatch[1].split(',').map(c => parseFloat(c.trim()));
+        if (coords.length >= 3) {
+          data.location = { x: coords[0], y: coords[1], z: coords[2] };
+        }
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Erro ao parsear dados do jogador:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Obtém o dinossauro atual que o jogador está usando
+   * @param {string} steamId - Steam ID do jogador
+   * @returns {Promise<Object>} Dados do dinossauro atual
+   */
+  async getCurrentDinosaur(steamId) {
+    const playerData = await this.getPlayerData(steamId);
+    return playerData;
   }
 
   /**

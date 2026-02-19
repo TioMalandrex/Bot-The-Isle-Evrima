@@ -406,6 +406,10 @@
                         <h3>${dino.dinosaur_type}</h3>
                         <p><strong>Nome:</strong> ${dino.dinosaur_name || 'Sem nome'}</p>
                         <p><strong>Crescimento:</strong> ${(dino.growth_stage * 100).toFixed(0)}%</p>
+                        <p><strong>❤️ Vida:</strong> ${dino.health?.toFixed(0) || 'N/A'} | <strong>🍖 Fome:</strong> ${dino.hunger?.toFixed(0) || 'N/A'}</p>
+                        <p><strong>💧 Sede:</strong> ${dino.thirst?.toFixed(0) || 'N/A'} | <strong>⚡ Stamina:</strong> ${dino.stamina?.toFixed(0) || 'N/A'}</p>
+                        <p><strong>📍 Localização:</strong> X:${dino.location_x?.toFixed(0) || 0}, Y:${dino.location_y?.toFixed(0) || 0}, Z:${dino.location_z?.toFixed(0) || 0}</p>
+                        ${dino.mutations ? `<p><strong>🧬 Mutações:</strong> ${JSON.parse(dino.mutations).join(', ') || 'Nenhuma'}</p>` : ''}
                         <p><strong>Armazenado:</strong> ${new Date(dino.stored_at).toLocaleDateString('pt-BR')}</p>
                         <button class="btn btn-danger" style="margin-top: 10px;" onclick="removeDinosaur(${dino.id})">Remover</button>
                     </div>
