@@ -6,7 +6,12 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "test": "node tests/database.test.js"
+    "test": "node tests/database.test.js && node tests/economy.test.js && node tests/auto-detect.test.js && node tests/steamid-link.test.js && node tests/integration.test.js",
+    "test:db": "node tests/database.test.js",
+    "test:economy": "node tests/economy.test.js",
+    "test:auto": "node tests/auto-detect.test.js",
+    "test:steamid": "node tests/steamid-link.test.js",
+    "test:integration": "node tests/integration.test.js"
   },
   "keywords": ["the-isle", "evrima", "discord-bot", "game-server"],
   "author": "",
