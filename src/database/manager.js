@@ -412,42 +412,49 @@ class DatabaseManager {
   }
 
   updatePlayerStats(playerId, stats) {
-    return new Promise((resolve, reject) => {
-      const fields = [];
-      const values = [];
-      
-      if (stats.playtime_minutes !== undefined) {
-        fields.push('playtime_minutes = playtime_minutes + ?');
-        values.push(stats.playtime_minutes);
-      }
-      if (stats.kills !== undefined) {
-        fields.push('kills = kills + ?');
-        values.push(stats.kills);
-      }
-      if (stats.deaths !== undefined) {
-        fields.push('deaths = deaths + ?');
-        values.push(stats.deaths);
-      }
-      if (stats.distance_traveled !== undefined) {
-        fields.push('distance_traveled = distance_traveled + ?');
-        values.push(stats.distance_traveled);
-      }
-      if (stats.dinosaurs_played !== undefined) {
-        fields.push('dinosaurs_played = dinosaurs_played + ?');
-        values.push(stats.dinosaurs_played);
-      }
-      
-      fields.push('last_seen = CURRENT_TIMESTAMP');
-      values.push(playerId);
+    return new Promise(async (resolve, reject) => {
+      try {
+        // First ensure player stats record exists
+        await this.getPlayerStats(playerId);
+        
+        const updates = [];
+        const values = [];
+        
+        if (stats.playtime_minutes !== undefined) {
+          updates.push('playtime_minutes = playtime_minutes + ?');
+          values.push(stats.playtime_minutes);
+        }
+        if (stats.kills !== undefined) {
+          updates.push('kills = kills + ?');
+          values.push(stats.kills);
+        }
+        if (stats.deaths !== undefined) {
+          updates.push('deaths = deaths + ?');
+          values.push(stats.deaths);
+        }
+        if (stats.distance_traveled !== undefined) {
+          updates.push('distance_traveled = distance_traveled + ?');
+          values.push(stats.distance_traveled);
+        }
+        if (stats.dinosaurs_played !== undefined) {
+          updates.push('dinosaurs_played = dinosaurs_played + ?');
+          values.push(stats.dinosaurs_played);
+        }
+        
+        updates.push('last_seen = CURRENT_TIMESTAMP');
+        values.push(playerId);
 
-      this.db.run(`
-        INSERT INTO player_stats (player_id) VALUES (?)
-        ON CONFLICT(player_id) DO UPDATE SET ${fields.join(', ')}
-        WHERE player_id = ?
-      `, [...values, playerId], function(err) {
-        if (err) reject(err);
-        else resolve(this.changes);
-      });
+        this.db.run(`
+          UPDATE player_stats 
+          SET ${updates.join(', ')}
+          WHERE player_id = ?
+        `, values, function(err) {
+          if (err) reject(err);
+          else resolve(this.changes);
+        });
+      } catch (error) {
+        reject(error);
+      }
     });
   }
 

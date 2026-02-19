@@ -16,6 +16,29 @@ Um bot completo para o jogo **The Isle Evrima** com comunicação entre Servidor
 - **Aplicação automática**: Skins são aplicadas automaticamente no servidor (se conectado)
 - **Acesso dual**: Gerencie skins pelo Discord ou pelo site
 
+### 💰 Sistema de Economia
+- **Pontos**: Sistema de moeda virtual para o servidor
+- **Recompensas diárias**: Ganhe 100 pontos por dia
+- **Transferências**: Envie pontos para outros jogadores
+- **Histórico**: Acompanhe todas as transações
+- **Leaderboards**: Rankings de pontos, kills e tempo de jogo
+
+### 📊 Estatísticas de Jogador
+- **Tempo de jogo**: Rastreamento automático de horas jogadas
+- **Kills e Deaths**: Contador de abates e mortes
+- **K/D Ratio**: Cálculo automático de eficiência
+- **Distância percorrida**: Tracking de movimento no mapa
+- **Dinossauros jogados**: Contador de espécies utilizadas
+
+### 🛡️ Comandos de Admin (via RCON)
+- **Anúncios**: Envie mensagens para todo o servidor
+- **Kick/Ban**: Gerencie jogadores problemáticos
+- **Lista de jogadores**: Veja quem está online
+- **Mensagens diretas**: Envie DMs para jogadores no jogo
+- **Teleporte**: Comandos goto/bring para admins
+- **Controles do servidor**: Clima, hora do dia, save
+- **Logs de admin**: Registro de todas as ações administrativas
+
 ### Comunicação Multi-Plataforma
 - **Discord Bot**: Comandos slash interativos
 - **Interface Web**: Dashboard completo e intuitivo
@@ -131,6 +154,7 @@ http://localhost:3000
 
 Comandos disponíveis:
 
+**Jogador:**
 - `/link <steamid>` - Vincular seu Discord ao seu Steam ID
 - `/garage` - Ver seus dinossauros armazenados na garagem
 - `/store <tipo> [nome] [crescimento]` - Armazenar um dinossauro na garagem
@@ -138,13 +162,29 @@ Comandos disponíveis:
 - `/skins [tipo]` - Ver suas skins disponíveis
 - `/changeskin <tipo> <skin>` - Mudar a skin de um dinossauro
 - `/profile` - Ver seu perfil de jogador
+- `/stats` - Ver suas estatísticas de jogo
+
+**Economia:**
+- `/balance` - Ver seu saldo de pontos
+- `/daily` - Resgatar recompensa diária (100 pontos)
+- `/transfer <usuário> <quantidade>` - Transferir pontos para outro jogador
+- `/leaderboard [tipo]` - Ver ranking (pontos, kills, tempo de jogo)
+
+**Admin (requer permissões):**
+- `/announce <mensagem>` - Enviar anúncio para o servidor
+- `/kick <steamid> [motivo]` - Kickar jogador
+- `/ban <nome> <steamid> [motivo] [duração]` - Banir jogador
+- `/players` - Listar jogadores online
 
 **Exemplos de uso:**
 ```
 /link steamid:76561198012345678
 /store tipo:Tyrannosaurus nome:Rexy crescimento:1.0
 /changeskin tipo:Tyrannosaurus skin:rex_apex
-/garage
+/balance
+/daily
+/transfer @amigo 50
+/leaderboard tipo:kills
 ```
 
 ### Interface Web
