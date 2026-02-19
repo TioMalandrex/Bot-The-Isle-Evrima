@@ -50,6 +50,35 @@ class DiscordBot {
           case 'link':
             await this.handleLinkCommand(interaction);
             break;
+          // Novos comandos de economia
+          case 'balance':
+            await this.handleBalanceCommand(interaction);
+            break;
+          case 'daily':
+            await this.handleDailyCommand(interaction);
+            break;
+          case 'transfer':
+            await this.handleTransferCommand(interaction);
+            break;
+          case 'leaderboard':
+            await this.handleLeaderboardCommand(interaction);
+            break;
+          // Novos comandos de admin
+          case 'announce':
+            await this.handleAnnounceCommand(interaction);
+            break;
+          case 'kick':
+            await this.handleKickCommand(interaction);
+            break;
+          case 'ban':
+            await this.handleBanCommand(interaction);
+            break;
+          case 'players':
+            await this.handlePlayersCommand(interaction);
+            break;
+          case 'stats':
+            await this.handleStatsCommand(interaction);
+            break;
         }
       } catch (error) {
         console.error('Erro ao processar comando:', error);
@@ -122,7 +151,90 @@ class DiscordBot {
         .addStringOption(option =>
           option.setName('steamid')
             .setDescription('Seu Steam ID (ex: 76561198012345678)')
+            .setRequired(true)),
+      
+      // Comandos de Economia
+      new SlashCommandBuilder()
+        .setName('balance')
+        .setDescription('Ver seu saldo de pontos'),
+      
+      new SlashCommandBuilder()
+        .setName('daily')
+        .setDescription('Resgatar recompensa diária de pontos'),
+      
+      new SlashCommandBuilder()
+        .setName('transfer')
+        .setDescription('Transferir pontos para outro jogador')
+        .addUserOption(option =>
+          option.setName('usuario')
+            .setDescription('Usuário que receberá os pontos')
             .setRequired(true))
+        .addIntegerOption(option =>
+          option.setName('quantidade')
+            .setDescription('Quantidade de pontos a transferir')
+            .setRequired(true)),
+      
+      new SlashCommandBuilder()
+        .setName('leaderboard')
+        .setDescription('Ver ranking de jogadores')
+        .addStringOption(option =>
+          option.setName('tipo')
+            .setDescription('Tipo de ranking')
+            .setRequired(false)
+            .addChoices(
+              { name: 'Pontos', value: 'points' },
+              { name: 'Kills', value: 'kills' },
+              { name: 'Tempo de Jogo', value: 'playtime_minutes' }
+            )),
+      
+      // Comandos de Admin
+      new SlashCommandBuilder()
+        .setName('announce')
+        .setDescription('[Admin] Enviar anúncio para o servidor do jogo')
+        .addStringOption(option =>
+          option.setName('mensagem')
+            .setDescription('Mensagem a ser anunciada')
+            .setRequired(true)),
+      
+      new SlashCommandBuilder()
+        .setName('kick')
+        .setDescription('[Admin] Kickar um jogador do servidor')
+        .addStringOption(option =>
+          option.setName('steamid')
+            .setDescription('Steam ID do jogador')
+            .setRequired(true))
+        .addStringOption(option =>
+          option.setName('motivo')
+            .setDescription('Motivo do kick')
+            .setRequired(false)),
+      
+      new SlashCommandBuilder()
+        .setName('ban')
+        .setDescription('[Admin] Banir um jogador do servidor')
+        .addStringOption(option =>
+          option.setName('nome')
+            .setDescription('Nome do jogador')
+            .setRequired(true))
+        .addStringOption(option =>
+          option.setName('steamid')
+            .setDescription('Steam ID do jogador')
+            .setRequired(true))
+        .addStringOption(option =>
+          option.setName('motivo')
+            .setDescription('Motivo do ban')
+            .setRequired(false))
+        .addIntegerOption(option =>
+          option.setName('duracao')
+            .setDescription('Duração em horas (0 = permanente)')
+            .setRequired(false)),
+      
+      new SlashCommandBuilder()
+        .setName('players')
+        .setDescription('[Admin] Listar jogadores online no servidor'),
+      
+      new SlashCommandBuilder()
+        .setName('stats')
+        .setDescription('Ver suas estatísticas de jogo')
     ];
   }
 
@@ -345,6 +457,310 @@ class DiscordBot {
         content: '❌ Erro ao vincular Steam ID. Tente novamente.'
       });
     }
+  }
+
+  // ===== Handlers de Economia =====
+
+  async handleBalanceCommand(interaction) {
+    await interaction.deferReply();
+    
+    const player = await this.database.getOrCreatePlayer(
+      interaction.user.id,
+      interaction.user.username
+    );
+    
+    const economy = await this.database.getPlayerEconomy(player.id);
+    
+    const embed = new EmbedBuilder()
+      .setTitle('💰 Seu Saldo')
+      .setColor('#ffd700')
+      .addFields(
+        { name: 'Pontos Disponíveis', value: economy.points.toString(), inline: true },
+        { name: 'Total Ganho', value: economy.total_earned.toString(), inline: true },
+        { name: 'Total Gasto', value: economy.total_spent.toString(), inline: true }
+      );
+    
+    await interaction.editReply({ embeds: [embed] });
+  }
+
+  async handleDailyCommand(interaction) {
+    await interaction.deferReply();
+    
+    const player = await this.database.getOrCreatePlayer(
+      interaction.user.id,
+      interaction.user.username
+    );
+    
+    const economy = await this.database.getPlayerEconomy(player.id);
+    
+    // Verificar se já resgatou hoje
+    if (economy.last_daily) {
+      const lastDaily = new Date(economy.last_daily);
+      const now = new Date();
+      const diffHours = (now - lastDaily) / (1000 * 60 * 60);
+      
+      if (diffHours < 24) {
+        const hoursLeft = Math.ceil(24 - diffHours);
+        await interaction.editReply(`❌ Você já resgatou sua recompensa diária! Volte em ${hoursLeft} horas.`);
+        return;
+      }
+    }
+    
+    const dailyAmount = 100;
+    await this.database.addPoints(player.id, dailyAmount, 'Recompensa diária');
+    
+    // Atualizar last_daily
+    await this.database.db.run('UPDATE player_economy SET last_daily = CURRENT_TIMESTAMP WHERE player_id = ?', [player.id]);
+    
+    const embed = new EmbedBuilder()
+      .setTitle('🎁 Recompensa Diária')
+      .setColor('#00ff00')
+      .setDescription(`Você recebeu **${dailyAmount} pontos**!`);
+    
+    await interaction.editReply({ embeds: [embed] });
+  }
+
+  async handleTransferCommand(interaction) {
+    await interaction.deferReply();
+    
+    const targetUser = interaction.options.getUser('usuario');
+    const amount = interaction.options.getInteger('quantidade');
+    
+    if (amount <= 0) {
+      await interaction.editReply('❌ A quantidade deve ser maior que zero.');
+      return;
+    }
+    
+    if (targetUser.id === interaction.user.id) {
+      await interaction.editReply('❌ Você não pode transferir pontos para si mesmo.');
+      return;
+    }
+    
+    const fromPlayer = await this.database.getOrCreatePlayer(
+      interaction.user.id,
+      interaction.user.username
+    );
+    
+    const toPlayer = await this.database.getOrCreatePlayer(
+      targetUser.id,
+      targetUser.username
+    );
+    
+    try {
+      await this.database.transferPoints(fromPlayer.id, toPlayer.id, amount);
+      
+      const embed = new EmbedBuilder()
+        .setTitle('✅ Transferência Realizada')
+        .setColor('#00ff00')
+        .setDescription(`Você transferiu **${amount} pontos** para ${targetUser.username}`);
+      
+      await interaction.editReply({ embeds: [embed] });
+    } catch (error) {
+      await interaction.editReply('❌ Pontos insuficientes para transferência.');
+    }
+  }
+
+  async handleLeaderboardCommand(interaction) {
+    await interaction.deferReply();
+    
+    const type = interaction.options.getString('tipo') || 'points';
+    const leaderboard = await this.database.getLeaderboard(type, 10);
+    
+    if (leaderboard.length === 0) {
+      await interaction.editReply('Nenhum dado disponível para o ranking.');
+      return;
+    }
+    
+    const typeNames = {
+      points: 'Pontos',
+      kills: 'Kills',
+      playtime_minutes: 'Tempo de Jogo'
+    };
+    
+    const embed = new EmbedBuilder()
+      .setTitle(`🏆 Ranking - ${typeNames[type]}`)
+      .setColor('#ffd700');
+    
+    let description = '';
+    leaderboard.forEach((entry, index) => {
+      const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
+      let value = '';
+      
+      if (type === 'points') {
+        value = `${entry.points} pontos`;
+      } else if (type === 'kills') {
+        value = `${entry.kills} kills`;
+      } else if (type === 'playtime_minutes') {
+        const hours = Math.floor(entry.playtime_minutes / 60);
+        value = `${hours}h`;
+      }
+      
+      description += `${medal} **${entry.username}** - ${value}\n`;
+    });
+    
+    embed.setDescription(description);
+    await interaction.editReply({ embeds: [embed] });
+  }
+
+  // ===== Handlers de Admin =====
+
+  async handleAnnounceCommand(interaction) {
+    await interaction.deferReply({ ephemeral: true });
+    
+    // Verificar se é admin (pode adicionar verificação de roles aqui)
+    if (!interaction.memberPermissions.has('Administrator')) {
+      await interaction.editReply('❌ Você não tem permissão para usar este comando.');
+      return;
+    }
+    
+    if (!this.gameServer.isConnected()) {
+      await interaction.editReply('❌ Servidor do jogo não está conectado.');
+      return;
+    }
+    
+    const message = interaction.options.getString('mensagem');
+    
+    try {
+      await this.gameServer.announce(message);
+      
+      // Log admin action
+      const player = await this.database.getOrCreatePlayer(
+        interaction.user.id,
+        interaction.user.username
+      );
+      await this.database.logAdminAction(player.id, 'announce', null, message);
+      
+      await interaction.editReply('✅ Anúncio enviado para o servidor!');
+    } catch (error) {
+      console.error('Erro ao enviar anúncio:', error);
+      await interaction.editReply('❌ Erro ao enviar anúncio.');
+    }
+  }
+
+  async handleKickCommand(interaction) {
+    await interaction.deferReply({ ephemeral: true });
+    
+    if (!interaction.memberPermissions.has('Administrator')) {
+      await interaction.editReply('❌ Você não tem permissão para usar este comando.');
+      return;
+    }
+    
+    if (!this.gameServer.isConnected()) {
+      await interaction.editReply('❌ Servidor do jogo não está conectado.');
+      return;
+    }
+    
+    const steamId = interaction.options.getString('steamid');
+    const reason = interaction.options.getString('motivo') || 'Kicked by admin';
+    
+    try {
+      await this.gameServer.kickPlayer(steamId, reason);
+      
+      // Log admin action
+      const player = await this.database.getOrCreatePlayer(
+        interaction.user.id,
+        interaction.user.username
+      );
+      await this.database.logAdminAction(player.id, 'kick', steamId, reason);
+      
+      await interaction.editReply(`✅ Jogador kickado do servidor.\nMotivo: ${reason}`);
+    } catch (error) {
+      console.error('Erro ao kickar jogador:', error);
+      await interaction.editReply('❌ Erro ao kickar jogador.');
+    }
+  }
+
+  async handleBanCommand(interaction) {
+    await interaction.deferReply({ ephemeral: true });
+    
+    if (!interaction.memberPermissions.has('Administrator')) {
+      await interaction.editReply('❌ Você não tem permissão para usar este comando.');
+      return;
+    }
+    
+    if (!this.gameServer.isConnected()) {
+      await interaction.editReply('❌ Servidor do jogo não está conectado.');
+      return;
+    }
+    
+    const playerName = interaction.options.getString('nome');
+    const steamId = interaction.options.getString('steamid');
+    const reason = interaction.options.getString('motivo') || 'Banned by admin';
+    const duration = interaction.options.getInteger('duracao') || 0;
+    
+    try {
+      await this.gameServer.banPlayer(playerName, steamId, reason, duration);
+      
+      // Log admin action
+      const player = await this.database.getOrCreatePlayer(
+        interaction.user.id,
+        interaction.user.username
+      );
+      await this.database.logAdminAction(player.id, 'ban', steamId, `${reason} - ${duration}h`);
+      
+      const durationText = duration === 0 ? 'permanentemente' : `por ${duration} horas`;
+      await interaction.editReply(`✅ Jogador banido ${durationText}.\nMotivo: ${reason}`);
+    } catch (error) {
+      console.error('Erro ao banir jogador:', error);
+      await interaction.editReply('❌ Erro ao banir jogador.');
+    }
+  }
+
+  async handlePlayersCommand(interaction) {
+    await interaction.deferReply();
+    
+    if (!this.gameServer.isConnected()) {
+      await interaction.editReply('❌ Servidor do jogo não está conectado.');
+      return;
+    }
+    
+    try {
+      const response = await this.gameServer.listPlayers();
+      
+      const embed = new EmbedBuilder()
+        .setTitle('👥 Jogadores Online')
+        .setColor('#0099ff')
+        .setDescription(response || 'Nenhum jogador online');
+      
+      await interaction.editReply({ embeds: [embed] });
+    } catch (error) {
+      console.error('Erro ao listar jogadores:', error);
+      await interaction.editReply('❌ Erro ao listar jogadores.');
+    }
+  }
+
+  async handleStatsCommand(interaction) {
+    await interaction.deferReply();
+    
+    const player = await this.database.getOrCreatePlayer(
+      interaction.user.id,
+      interaction.user.username
+    );
+    
+    const stats = await this.database.getPlayerStats(player.id);
+    const economy = await this.database.getPlayerEconomy(player.id);
+    
+    const hours = Math.floor(stats.playtime_minutes / 60);
+    const minutes = stats.playtime_minutes % 60;
+    const kd = stats.deaths > 0 ? (stats.kills / stats.deaths).toFixed(2) : stats.kills;
+    
+    const embed = new EmbedBuilder()
+      .setTitle(`📊 Estatísticas de ${player.username}`)
+      .setColor('#0099ff')
+      .addFields(
+        { name: 'Tempo de Jogo', value: `${hours}h ${minutes}m`, inline: true },
+        { name: 'Kills', value: stats.kills.toString(), inline: true },
+        { name: 'Deaths', value: stats.deaths.toString(), inline: true },
+        { name: 'K/D Ratio', value: kd.toString(), inline: true },
+        { name: 'Pontos', value: economy.points.toString(), inline: true },
+        { name: 'Dinossauros Jogados', value: stats.dinosaurs_played.toString(), inline: true }
+      );
+    
+    if (stats.last_seen) {
+      embed.setFooter({ text: `Último visto: ${new Date(stats.last_seen).toLocaleString('pt-BR')}` });
+    }
+    
+    await interaction.editReply({ embeds: [embed] });
   }
 
   async start() {
