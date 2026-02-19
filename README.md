@@ -49,17 +49,17 @@ Um bot completo para o jogo **The Isle Evrima** com comunicação entre Servidor
 A interface web oferece uma experiência visual completa para gerenciar seus dinossauros e skins:
 
 ### 🏠 Garagem de Dinossauros
-![Garagem de Dinossauros](https://github.com/user-attachments/assets/c2c80f31-537b-4e97-aa5d-4c0b73fbb7a9)
+![Garagem de Dinossauros](https://github.com/user-attachments/assets/4d7bc981-f7a5-4ff5-a339-67d9b501826c)
 
-Armazene e gerencie seus dinossauros com facilidade. Escolha o tipo, dê um nome e defina o nível de crescimento.
+Armazene e gerencie seus dinossauros com facilidade. Agora com informações completas: vida, fome, sede, stamina, localização no mapa e mutações!
 
 ### 🎨 Gerenciador de Skins
-![Gerenciador de Skins](https://github.com/user-attachments/assets/433b6c3f-3f48-4fef-9454-bdd210d0b46e)
+![Gerenciador de Skins](https://github.com/user-attachments/assets/53da7f14-8403-4fbe-83fa-97cde1e7a62c)
 
 Desbloqueie e aplique skins personalizadas para seus dinossauros favoritos.
 
 ### 👤 Perfil do Jogador
-![Perfil do Jogador](https://github.com/user-attachments/assets/488bcf65-2f2f-4ed7-a54c-242af3538c1c)
+![Perfil do Jogador](https://github.com/user-attachments/assets/e3eaa27c-f6ab-418d-bb5f-e6e4973209c2)
 
 Visualize todas as suas informações, incluindo Discord ID, Steam ID vinculado, dinossauros na garagem e skins desbloqueadas.
 
